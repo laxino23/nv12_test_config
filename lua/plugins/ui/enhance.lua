@@ -208,7 +208,6 @@ return {
     event = "VeryLazy",
     opts = {
       cursor_color = "#a020f0",
-      particles_enabled = true,
       stiffness = 0.8,
       trailing_stiffness = 0.2,
       trailing_exponent = 5,
@@ -217,6 +216,7 @@ return {
       gamma = 1,
       never_draw_over_target = true, -- if you want to actually see under the cursor
       hide_target_hack = true, -- same
+      particles_enabled = false,
       particle_spread = 1,
       particles_per_second = 500,
       particles_per_length = 50,

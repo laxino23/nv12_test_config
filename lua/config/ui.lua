@@ -19,14 +19,16 @@ M.cmp_draw = {
       end,
     },
     kind = {
-      text = function(ctx) return "[" .. ctx.kind .. "]" end, -- 显示文字，如 [Function]
+      text = function(ctx)
+        return "[" .. ctx.kind .. "]"
+      end, -- 显示文字，如 [Function]
       highlight = function(ctx)
         local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
         return hl
       end,
     },
   },
-  
+
   -- 针对 lspkind 插件的渲染配置 (这也是目前较为主流的配置)
   lspkind = {
     kind_icon = {
@@ -60,7 +62,9 @@ M.cmp_draw = {
       end,
     },
     kind = {
-      text = function(ctx) return "[" .. ctx.kind .. "]" end,
+      text = function(ctx)
+        return "[" .. ctx.kind .. "]"
+      end,
       highlight = function(ctx)
         -- 略... (逻辑同上)
         local hl = ctx.kind_hl
@@ -98,22 +102,29 @@ M.layout = {
     preview = false, -- 不显示预览
     layout = {
       backdrop = false,
-      row = 0.4, width = 0.7, min_width = 80, height = 0.4, min_height = 3,
+      row = 0.4,
+      width = 0.7,
+      min_width = 80,
+      height = 0.4,
+      min_height = 3,
       box = "vertical",
       border = "rounded",
       title = "{title}",
       title_pos = "center",
       { win = "input", height = 1, border = "bottom" }, -- 输入框在顶部
-      { win = "list", border = "none" },                -- 列表在下
+      { win = "list", border = "none" }, -- 列表在下
       { win = "preview", title = "{preview}", height = 0.4, border = "top" },
     },
   },
-  
+
   -- dropdown: 标准下拉大弹窗 (居中)
   dropdown = {
     layout = {
       backdrop = false,
-      row = -1, width = 0.85, min_width = 80, height = 0.9, -- 占据屏幕 90% 高度
+      row = -1,
+      width = 0.85,
+      min_width = 80,
+      height = 0.9, -- 占据屏幕 90% 高度
       border = "none",
       box = "vertical",
       { win = "preview", title = "{preview}", height = 0.45, border = "rounded" }, -- 预览窗口在上
@@ -123,16 +134,19 @@ M.layout = {
         title = "{title} {live} {flags}",
         title_pos = "center",
         { win = "input", height = 1, border = "bottom" }, -- 输入框
-        { win = "list", border = "none" },                -- 列表在最下
+        { win = "list", border = "none" }, -- 列表在最下
       },
     },
   },
-  
+
   -- dropdown_pick: 紧凑型下拉 (用于快速文件切换，如你的 ff 快捷键)
   dropdown_pick = {
     layout = {
       backdrop = false,
-      row = -1, width = 0.75, min_width = 80, height = 0.4, -- 只占 40% 高度
+      row = -1,
+      width = 0.75,
+      min_width = 80,
+      height = 0.4, -- 只占 40% 高度
       border = "none",
       box = "vertical",
       -- 注意：这里注释掉了 preview，说明这个布局默认不看预览，只看列表
@@ -146,13 +160,16 @@ M.layout = {
       },
     },
   },
-  
+
   -- vscode: 模仿 VSCode 命令面板的风格
   vscode = {
     preview = false,
     layout = {
       backdrop = false,
-      row = 0.4, width = 0.7, min_width = 80, height = 0.4,
+      row = 0.4,
+      width = 0.7,
+      min_width = 80,
+      height = 0.4,
       border = "none",
       box = "vertical",
       {
@@ -166,13 +183,15 @@ M.layout = {
       { win = "preview", title = "{preview}", border = "rounded" },
     },
   },
-  
+
   -- ivy: 底部面板风格 (类似 Emacs Ivy)
   ivy = {
     layout = {
       box = "vertical",
       backdrop = false,
-      row = -1, width = 0, height = 0.35, -- 宽度 0 表示占满全宽，高度 35%
+      row = -1,
+      width = 0,
+      height = 0.35, -- 宽度 0 表示占满全宽，高度 35%
       border = "top", -- 只有顶部有边框
       title = " {title} {live} {flags}",
       title_pos = "left",
@@ -183,13 +202,15 @@ M.layout = {
       },
     },
   },
-  
+
   -- ivy_preview: 带预览的 Ivy 风格
   ivy_preview = {
     layout = {
       box = "vertical",
       backdrop = false,
-      row = -1, width = 0, height = 0.45,
+      row = -1,
+      width = 0,
+      height = 0.45,
       border = "top",
       title = " {title} {live} {flags}",
       title_pos = "left",
@@ -201,12 +222,15 @@ M.layout = {
       },
     },
   },
-  
+
   -- ivy_border: <leader>/ (grep lines) 使用了这个布局
   ivy_border = {
     layout = {
       box = "horizontal",
-      row = -1, width = 0, min_width = 120, height = 0.35,
+      row = -1,
+      width = 0,
+      min_width = 120,
+      height = 0.35,
       backdrop = false,
       {
         box = "vertical",
@@ -218,13 +242,15 @@ M.layout = {
       { win = "preview", title = "{preview}", border = "rounded", width = 0.45 },
     },
   },
-  
+
   -- right: 右侧边栏风格 (你的 <leader>E 使用了这个)
   right = {
     preview = "main", -- 预览显示在主窗口
     layout = {
       backdrop = false,
-      width = 40, min_width = 40, height = 0, -- 高度 0 表示占满全高
+      width = 40,
+      min_width = 40,
+      height = 0, -- 高度 0 表示占满全高
       position = "right",
       border = "none",
       box = "vertical",
@@ -242,17 +268,20 @@ M.layout = {
 }
 
 -- ===========================================================================
--- 4. fzf: 针对 fzf-lua 插件的布局配置 (如果你还在用 fzf-lua 的话)
+-- 4. fzf: 针对 fzf-lua 插件的布局配置
 -- ===========================================================================
 M.fzf = {
   dropdown = {
     winopts = {
-      height = 0.70, width = 0.80, row = 1, col = 0.50,
-      border = "none", backdrop = 100,
+      height = 0.70,
+      width = 0.80,
+      row = 1,
+      col = 0.50,
+      border = "none",
+      backdrop = 100,
       preview = { border = "rounded", wrap = true, layout = "vertical", vertical = "up:45%" },
     },
   },
-  -- ... 其他 fzf 配置 ...
 }
 
 -- ===========================================================================
@@ -262,48 +291,66 @@ M.fzf = {
 M.icons = {
   -- 默认 LSP 类型图标 (VSCode 风格)
   default_kind_icons = {
-    Array = "", Boolean = "󰨙", Class = "", Function = "", Method = "", -- ...
-  },
-  
-  -- 适配 Mini.nvim 的图标
-  mini_kind_icons = { -- ...
+    Array = "",
+    Boolean = "󰨙",
+    Class = "",
+    Function = "",
+    Method = "",
   },
 
+  -- 适配 Mini.nvim 的图标
+  mini_kind_icons = {},
+
   -- 适配 Lazy.nvim 风格的图标
-  lazy_kind_icons = { -- ...
-  },
-  
+  lazy_kind_icons = {},
+
   -- 在 snacks.nvim 中引用的 ui.icons.lspkind_kind_icons
   lspkind_kind_icons = {
-    String = " ", Object = " ", Array = " ", Boolean = "󰨙 ",
-    Text = "󰉿", Number = "󰎠 ", Method = "󰊕", Function = "󰊕",
-    Constructor = "", Field = "󰜢", Variable = "󰀫", Class = "󰠱",
-    -- ...
+    String = " ",
+    Object = " ",
+    Array = " ",
+    Boolean = "󰨙 ",
+    Text = "󰉿",
+    Number = "󰎠 ",
+    Method = "󰊕",
+    Function = "󰊕",
+    Constructor = "",
+    Field = "󰜢",
+    Variable = "󰀫",
+    Class = "󰠱",
     Snippet = "󱄽 ",
     File = "󰈙",
     Folder = "󰉋",
-    -- ...
   },
 
   -- 杂项图标 (Git, 调试, 终端等)
   misc = {
-    dots = "󰇘", bug = "", git = "", search = "", terminal = "",
+    dots = "󰇘",
+    bug = "",
+    git = "",
+    search = "",
+    terminal = "",
   },
-  
+
   -- 调试工具 (DAP) 图标
   dap = {
     Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" }, -- 调试暂停时的箭头
     Breakpoint = " ", -- 断点图标
   },
-  
+
   -- 诊断信息 (Diagnostics) 图标 (错误, 警告等)
   diagnostics = {
-    Error = " ", Warn = " ", Hint = " ", Info = " ",
+    Error = " ",
+    Warn = " ",
+    Hint = " ",
+    Info = " ",
   },
-  
+
   -- Git 状态图标 (增加, 修改, 删除)
   git = {
-    added = " ", modified = " ", removed = " ",
+    added = " ",
+    modified = " ",
+    removed = " ",
   },
 }
 

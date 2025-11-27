@@ -8,62 +8,62 @@ return {
     opts = {
       -- 使用预设的配置方案
       "border-fused", -- 边框风格：融合风格
-      "hide",         -- 默认隐藏一些不必要的元素
-      
+      "hide", -- 默认隐藏一些不必要的元素
+
       -- fzf 内部颜色配置
       fzf_colors = {
         true, -- 继承 Neovim 的配色
         -- 匹配到的字符高亮：使用 SnacksPickerMatch 高亮组，加粗、斜体、下划线
         ["hl+"] = { "fg", "SnacksPickerMatch", "bold", "italic", "underline" },
       },
-      
+
       -- 传递给 fzf 二进制文件的原生参数
       fzf_opts = {
         ["--no-scrollbar"] = true, -- 隐藏滚动条
       },
-      
+
       -- === 默认窗口配置 ===
       -- 如果快捷键里没有指定 winopts，就会用这一套默认的
       winopts = {
         height = 0.9, -- 窗口高度占比 90%
-        width = 1,    -- 窗口宽度占比 100% (全宽)
-        row = 1,      -- 窗口位置：底部 (1 表示 bottom)
-        col = 0,      -- 窗口位置：左侧
+        width = 1, -- 窗口宽度占比 100% (全宽)
+        row = 1, -- 窗口位置：底部 (1 表示 bottom)
+        col = 0, -- 窗口位置：左侧
         border = "rounded", -- 圆角边框
-        backdrop = 100,     -- 背景遮罩透明度 (100 表示完全变暗/不透明，或者非常暗)
-        
+        backdrop = 100, -- 背景遮罩透明度 (100 表示完全变暗/不透明，或者非常暗)
+
         -- 预览窗口配置
         preview = {
           border = "rounded",
-          wrap = true,    -- 自动换行
+          wrap = true, -- 自动换行
           hidden = false, -- 默认显示预览
           layout = "vertical", -- 垂直布局 (预览在上方或下方)
           vertical = "up:55%", -- 预览窗口在上方，占据 55% 的高度
         },
       },
-      
+
       -- === 文件查找配置 ===
       files = {
         multiprocess = true, -- 启用多进程搜索 (更快)
-        git_icons = true,    -- 显示 Git 状态图标
-        file_icons = true,   -- 显示文件图标
-        color_icons = true,  -- 图标彩色
+        git_icons = true, -- 显示 Git 状态图标
+        file_icons = true, -- 显示文件图标
+        color_icons = true, -- 图标彩色
         -- 路径格式化：文件名优先
         -- 显示为: config.lua (lua/core/) 而不是 lua/core/config.lua
         -- 这对于在很深的目录中查找文件非常有用
         formatter = "path.filename_first",
       },
-      
+
       -- 历史文件 (Oldfiles) 配置
       oldfiles = {
         formatter = "path.filename_first",
       },
-      
+
       -- 缓冲区 (Buffers) 配置
       buffers = {
         formatter = "path.filename_first",
       },
-      
+
       -- LSP 符号配置
       lsp = {
         symbols = {
@@ -71,7 +71,7 @@ return {
           symbol_icons = ui.icons.mini_kind_icons,
         },
       },
-      
+
       -- 诊断信息配置
       diagnostics = {
         cwd_only = true, -- 只显示当前工作目录下的报错
@@ -79,7 +79,7 @@ return {
         git_icons = true,
       },
     },
-    
+
     -- === 快捷键映射 ===
     keys = {
       -- 1. 缓冲区查找
@@ -92,7 +92,7 @@ return {
         end,
         desc = "Fzf buffers",
       },
-      
+
       -- 2. 配色方案切换 (带预览，非常实用)
       {
         "<leader>fc",
@@ -101,7 +101,7 @@ return {
         end,
         desc = "Fzf colorschemes",
       },
-      
+
       -- 3. 全局搜索 (Global)
       -- 注意：这里使用了 core.ui 中定义的 Ivy 布局 (底部面板风格)
       {
@@ -113,7 +113,7 @@ return {
         end,
         desc = "Global",
       },
-      
+
       -- 4. 自动命令 (Autocmds)
       -- 注意：这里使用了 core.ui 中定义的 Dropdown 布局 (下拉框风格)
       {
@@ -123,7 +123,7 @@ return {
         end,
         desc = "Fzf Autocmds",
       },
-      
+
       -- 5. Location List
       {
         "<leader>fl",
@@ -132,7 +132,7 @@ return {
         end,
         desc = "Fzf location list",
       },
-      
+
       -- 6. 查看快捷键 (Keymaps)
       {
         "<leader>fk",
@@ -141,7 +141,7 @@ return {
         end,
         desc = "Fzf keymaps",
       },
-      
+
       -- 7. 跳转列表 (Jumps)
       {
         "<leader>fj",
@@ -150,7 +150,7 @@ return {
         end,
         desc = "Fzf jumps",
       },
-      
+
       -- 8. 寄存器 (Registers) - 查看复制粘贴板历史
       {
         "<leader>fr",
@@ -159,10 +159,10 @@ return {
         end,
         desc = "Fzf registers",
       },
-      
+
       -- === Git 相关功能 (强项) ===
       -- 这里的快捷键全部使用 <leader>g 开头，并且统一使用 Dropdown 布局
-      
+
       {
         "<leader>gf",
         function()

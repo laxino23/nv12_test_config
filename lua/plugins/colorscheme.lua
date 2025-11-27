@@ -86,7 +86,7 @@ return {
         dark_style = "desert", -- Style to use when vim.o.background is "dark"
         light_style = "day", -- Style to use when vim.o.background is "light"
         style = nil, -- Optional: Set a single style to disable auto-switching (e.g., "lagoon", "desert")
-        use_legacy_comments = false, -- Uses the legacy comment color from desert.vim for the "desert" style only (a bright sky blue)
+        use_legacy_comments = false,
 
         styles = {
           bold = true, -- Enable bold text (keywords, functions, etc.)
@@ -196,4 +196,3 @@ return {
     end,
   },
 }
-

@@ -12,44 +12,84 @@ local fzflua = require("fzf-lua")
 -- 如果全局设置是用 fzf，就调 fzf-lua；否则调 snacks.picker
 
 local function lsp_definitions()
-  if is_fzf_picker then fzflua.lsp_definitions() else Snacks.picker.lsp_definitions() end
+  if is_fzf_picker then
+    fzflua.lsp_definitions()
+  else
+    Snacks.picker.lsp_definitions()
+  end
 end
 
 local function lsp_declarations()
-  if is_fzf_picker then fzflua.lsp_declarations() else Snacks.picker.lsp_declarations() end
+  if is_fzf_picker then
+    fzflua.lsp_declarations()
+  else
+    Snacks.picker.lsp_declarations()
+  end
 end
 
 local function lsp_implementations()
-  if is_fzf_picker then fzflua.lsp_implementations() else Snacks.picker.lsp_implementations() end
+  if is_fzf_picker then
+    fzflua.lsp_implementations()
+  else
+    Snacks.picker.lsp_implementations()
+  end
 end
 
 local function lsp_references()
-  if is_fzf_picker then fzflua.lsp_references() else Snacks.picker.lsp_references() end
+  if is_fzf_picker then
+    fzflua.lsp_references()
+  else
+    Snacks.picker.lsp_references()
+  end
 end
 
 local function lsp_type_definitions()
-  if is_fzf_picker then fzflua.lsp_typedefs() else Snacks.picker.lsp_type_definitions() end
+  if is_fzf_picker then
+    fzflua.lsp_typedefs()
+  else
+    Snacks.picker.lsp_type_definitions()
+  end
 end
 
 local function lsp_incoming_calls()
-  if is_fzf_picker then fzflua.lsp_incoming_calls() else Snacks.picker.lsp_incoming_calls() end
+  if is_fzf_picker then
+    fzflua.lsp_incoming_calls()
+  else
+    Snacks.picker.lsp_incoming_calls()
+  end
 end
 
 local function lsp_outgoing_calls()
-  if is_fzf_picker then fzflua.lsp_outgoing_calls() else Snacks.picker.lsp_outgoing_calls() end
+  if is_fzf_picker then
+    fzflua.lsp_outgoing_calls()
+  else
+    Snacks.picker.lsp_outgoing_calls()
+  end
 end
 
 local function lsp_symbols() -- 当前文件的符号 (Outline)
-  if is_fzf_picker then fzflua.lsp_document_symbols() else Snacks.picker.lsp_symbols() end
+  if is_fzf_picker then
+    fzflua.lsp_document_symbols()
+  else
+    Snacks.picker.lsp_symbols()
+  end
 end
 
 local function lsp_workspace_symbols() -- 整个工作区的符号
-  if is_fzf_picker then fzflua.lsp_workspace_symbols() else Snacks.picker.lsp_workspace_symbols() end
+  if is_fzf_picker then
+    fzflua.lsp_workspace_symbols()
+  else
+    Snacks.picker.lsp_workspace_symbols()
+  end
 end
 
 -- 诊断信息 (Diagnostics) 查找
 local function diagnostics_buffer()
-  if is_fzf_picker then fzflua.diagnostics_document() else Snacks.picker.diagnostics_buffer() end
+  if is_fzf_picker then
+    fzflua.diagnostics_document()
+  else
+    Snacks.picker.diagnostics_buffer()
+  end
 end
 
 -- 工作区诊断信息 (包含自定义排序)
@@ -96,7 +136,7 @@ end
 M.keymap_setup = function()
   -- 基础 LSP 功能
   vim.keymap.set("n", "<leader>cl", "<cmd>LspInfo<cr>", { desc = "LspInfo" }) -- 查看 LSP 状态
-  
+
   -- 悬停查看文档 (Hover)
   vim.keymap.set("n", "K", function()
     vim.lsp.buf.hover({ border = "single" }) -- 使用单线边框
@@ -111,7 +151,12 @@ M.keymap_setup = function()
 
   -- CodeLens (代码透镜) 操作
   vim.keymap.set({ "n", "v" }, "<leader>cc", vim.lsp.codelens.run, { desc = "Codelens" })
-  vim.keymap.set({ "n", "v" }, "<leader>cC", vim.lsp.codelens.refresh, { desc = "Codelens Refresh" })
+  vim.keymap.set(
+    { "n", "v" },
+    "<leader>cC",
+    vim.lsp.codelens.refresh,
+    { desc = "Codelens Refresh" }
+  )
 
   -- 重命名 (Rename)
   vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename" }) -- 原生重命名
@@ -119,13 +164,19 @@ M.keymap_setup = function()
 
   -- 快速跳转引用 (Snacks words)
   -- 类似于 vim-illuminate，按 ]] 跳转到该变量下一次出现的地方
-  vim.keymap.set("n", "]]", function() Snacks.words.jump(vim.v.count1) end, { desc = "Next Reference" })
-  vim.keymap.set("n", "[[", function() Snacks.words.jump(-vim.v.count1) end, { desc = "Prev Reference" })
+  vim.keymap.set("n", "]]", function()
+    Snacks.words.jump(vim.v.count1)
+  end, { desc = "Next Reference" })
+  vim.keymap.set("n", "[[", function()
+    Snacks.words.jump(-vim.v.count1)
+  end, { desc = "Prev Reference" })
 
   -- 诊断信息跳转 (]d, [d, ]e, [e)
   local diagnostic_goto = function(count, severity)
     local opts = { count = count, severity = severity and vim.diagnostic.severity[severity] or nil }
-    return function() vim.diagnostic.jump(opts) end
+    return function()
+      vim.diagnostic.jump(opts)
+    end
   end
 
   vim.keymap.set("n", "]d", diagnostic_goto(1), { desc = "Next diagnostic" })
@@ -149,8 +200,18 @@ M.keymap_setup = function()
   -- 打开诊断列表
   vim.keymap.set("n", "<leader>xx", diagnostics_buffer, { desc = "Diagnostics" })
   vim.keymap.set("n", "<leader>xX", diagnostics_workspace, { desc = "Workspace Diagnostics" })
-  vim.keymap.set("n", "<leader>xw", diagnostics_workspace_warns, { desc = "Workspace Diagnostics(Warns)" })
-  vim.keymap.set("n", "<leader>xe", diagnostics_workspace_errors, { desc = "Workspace Diagnostics(Errors)" })
+  vim.keymap.set(
+    "n",
+    "<leader>xw",
+    diagnostics_workspace_warns,
+    { desc = "Workspace Diagnostics(Warns)" }
+  )
+  vim.keymap.set(
+    "n",
+    "<leader>xe",
+    diagnostics_workspace_errors,
+    { desc = "Workspace Diagnostics(Errors)" }
+  )
 end
 
 -- ===========================================================================
@@ -162,18 +223,25 @@ M.methods_setup = function(client, bufnr)
 
   -- [Neovim 0.12+] 关联编辑范围 (Linked Editing Range)
   -- 类似于 HTML 标签修改：改 <div> 自动改结尾的 </div>
-  if client:supports_method(Methods.textDocument_linkedEditingRange) and vim.fn.has("nvim-0.12") == 1 then
+  if
+    client:supports_method(Methods.textDocument_linkedEditingRange)
+    and vim.fn.has("nvim-0.12") == 1
+  then
     vim.lsp.linked_editing_range.enable(true, { client_id = client.id })
   end
-  
+
   -- [Neovim 0.12+] 输入时格式化 (On Type Formatting)
-  if client:supports_method(Methods.textDocument_onTypeFormatting) and vim.fn.has("nvim-0.12") == 1 then
+  if
+    client:supports_method(Methods.textDocument_onTypeFormatting) and vim.fn.has("nvim-0.12") == 1
+  then
     vim.lsp.on_type_formatting.enable(true, { client_id = client.id })
   end
 
   -- [Neovim 0.12+] 文档颜色 (Document Color)
   -- 比如在 CSS 中显示颜色背景。注释提到你可能更倾向于用 nvim-highlight-colors 插件。
-  if client:supports_method(Methods.textDocument_documentColor) and vim.fn.has("nvim-0.12") == 1 then
+  if
+    client:supports_method(Methods.textDocument_documentColor) and vim.fn.has("nvim-0.12") == 1
+  then
     vim.lsp.document_color.enable(true, bufnr, { style = "background" })
   end
 
@@ -185,8 +253,9 @@ M.methods_setup = function(client, bufnr)
   -- 光标下引用高亮 (Document Highlight)
   -- 当光标停留在变量上时，高亮该变量在当前文件中的所有出现
   if client:supports_method(Methods.textDocument_documentHighlight) then
-    local under_cursor_highlights_group = vim.api.nvim_create_augroup("xue/cursor_highlights", { clear = false })
-    
+    local under_cursor_highlights_group =
+      vim.api.nvim_create_augroup("xue/cursor_highlights", { clear = false })
+
     -- CursorHold: 光标停止移动一段时间后触发高亮
     vim.api.nvim_create_autocmd({ "CursorHold", "InsertLeave" }, {
       group = under_cursor_highlights_group,
@@ -243,7 +312,7 @@ end
 --    这是外部调用的主函数
 -- ===========================================================================
 M.on_attach = function(client, bufnr)
-  M.keymap_setup()           -- 设置快捷键
+  M.keymap_setup() -- 设置快捷键
   M.methods_setup(client, bufnr) -- 设置功能特性
 end
 

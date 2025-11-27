@@ -38,7 +38,7 @@ return {
         delete_check_events = "TextChanged",
         region_check_events = "CursorMoved",
       })
-      
+
       -- 文件类型扩展：在 typescript/react 文件中也能使用 javascript 的片段
       ls.filetype_extend("typescript", { "javascript" })
       ls.filetype_extend("javascriptreact", { "javascript" })
@@ -58,13 +58,13 @@ return {
     "Saghen/blink.cmp",
     dependencies = {
       { "fang2hou/blink-copilot" }, -- Copilot 接入 blink
-      { "folke/lazydev.nvim" },     -- 智能 Lua 配置补全
-      { "folke/sidekick.nvim" },    -- AI 辅助工具
+      { "folke/lazydev.nvim" }, -- 智能 Lua 配置补全
+      { "folke/sidekick.nvim" }, -- AI 辅助工具
       { "nicholasxjy/colorful-menu.nvim", opts = {} }, -- 让补全菜单显示更丰富的颜色 (比如 rust 类型颜色)
     },
     build = "cargo build --release", -- 编译 Rust 后端
     event = { "InsertEnter", "CmdlineEnter" }, -- 在插入模式或命令行输入时加载
-    
+
     opts = function()
       return {
         -- === 启用逻辑 ===
@@ -75,15 +75,18 @@ return {
             vim.bo.filetype
           ) and vim.b.completion ~= false and vim.bo.buftype ~= "prompt"
         end,
-        
+
         -- === 模糊匹配设置 ===
         fuzzy = {
           implementation = "prefer_rust", -- 优先使用 Rust 实现的匹配算法 (极快)
           sorts = {
-            "exact", "score", "sort_text", "label", -- 排序规则
+            "exact",
+            "score",
+            "sort_text",
+            "label", -- 排序规则
           },
         },
-        
+
         -- === 快捷键设置 ===
         keymap = {
           ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
@@ -97,7 +100,7 @@ return {
           ["<C-d>"] = { "scroll_documentation_down", "fallback" },
           ["<C-e>"] = { "hide", "fallback" },
           ["<CR>"] = { "accept", "fallback" }, -- 回车确认
-          
+
           -- [!] 超级 Tab 键逻辑：
           -- 1. 尝试 Sidekick 跳转 (AI)
           -- 2. 尝试代码片段跳转 (Snippet Forward)
@@ -116,7 +119,7 @@ return {
             "fallback",
           },
         },
-        
+
         -- === 函数签名提示 (输入参数时显示) ===
         signature = {
           enabled = true,
@@ -125,7 +128,7 @@ return {
             border = "rounded",
           },
         },
-        
+
         -- === 补全窗口外观 ===
         completion = {
           ghost_text = { enabled = true }, -- 显示灰色幽灵文本预览
@@ -135,7 +138,14 @@ return {
             window = {
               -- 动态边框：如果全局变量 vim.g.bordered 为真，则绘制复杂边框
               border = vim.g.bordered and {
-                { "", "DiagnosticHint" }, "─", "╮", "│", "╯", "─", "╰", "│",
+                { "", "DiagnosticHint" },
+                "─",
+                "╮",
+                "│",
+                "╯",
+                "─",
+                "╰",
+                "│",
               } or "none",
               max_height = 20,
               max_width = 40,
@@ -143,36 +153,50 @@ return {
           },
           accept = { auto_brackets = { enabled = true } }, -- 补全函数后自动加括号 ()
           list = { selection = { preselect = true, auto_insert = true } },
-          
+
           -- 补全菜单渲染 (核心视觉部分)
           menu = {
             scrollbar = false,
             border = vim.g.bordered and {
-              { "󱐋", "WarningMsg" }, "─", "╮", "│", "╯", "─", "╰", "│",
+              { "󱐋", "WarningMsg" },
+              "─",
+              "╮",
+              "│",
+              "╯",
+              "─",
+              "╰",
+              "│",
             } or "none",
-            
+
             -- 自定义绘制列
             draw = {
               columns = {
-                { "kind_icon" },      -- 第一列：图标
+                { "kind_icon" }, -- 第一列：图标
                 { "label", gap = 1 }, -- 第二列：文字标签
-                { "kind" },           -- 第三列：类型名称 (如 [Function])
+                { "kind" }, -- 第三列：类型名称 (如 [Function])
               },
               treesitter = { "lsp" }, -- 使用 LSP 的 Treesitter 高亮
-              
+
               -- 使用 colorful-menu 插件来渲染组件
               -- 这能让补全菜单里的类型颜色更加丰富（例如不同类型的变量显示不同颜色）
               components = {
                 label = {
-                  text = function(ctx) return require("colorful-menu").blink_components_text(ctx) end,
-                  highlight = function(ctx) return require("colorful-menu").blink_components_highlight(ctx) end,
+                  text = function(ctx)
+                    return require("colorful-menu").blink_components_text(ctx)
+                  end,
+                  highlight = function(ctx)
+                    return require("colorful-menu").blink_components_highlight(ctx)
+                  end,
                 },
                 kind_icon = {
                   text = function(ctx)
                     -- 特殊处理文件路径图标
                     if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                      local mini_icon, _ = require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
-                      if mini_icon then return mini_icon .. ctx.icon_gap end
+                      local mini_icon, _ =
+                        require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
+                      if mini_icon then
+                        return mini_icon .. ctx.icon_gap
+                      end
                     end
                     -- 使用 lspkind 图标
                     local icon = require("lspkind").symbolic(ctx.kind, { mode = "symbol" })
@@ -181,20 +205,28 @@ return {
                   highlight = function(ctx)
                     -- 特殊处理文件路径高亮
                     if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                      local mini_icon, mini_hl = require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
-                      if mini_icon then return mini_hl end
+                      local mini_icon, mini_hl =
+                        require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
+                      if mini_icon then
+                        return mini_hl
+                      end
                     end
                     return ctx.kind_hl
                   end,
                 },
                 -- kind 列同理...
                 kind = {
-                  text = function(ctx) return "[" .. ctx.kind .. "]" end,
+                  text = function(ctx)
+                    return "[" .. ctx.kind .. "]"
+                  end,
                   highlight = function(ctx)
                     -- ... (同上，省略部分重复代码)
                     if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                      local mini_icon, mini_hl = require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
-                      if mini_icon then return mini_hl end
+                      local mini_icon, mini_hl =
+                        require("mini.icons").get_icon(ctx.item.data.type, ctx.label)
+                      if mini_icon then
+                        return mini_hl
+                      end
                     end
                     return ctx.kind_hl
                   end,
@@ -203,7 +235,7 @@ return {
             },
           },
         },
-        
+
         -- === 命令行补全 (:) ===
         cmdline = {
           enabled = true,
@@ -214,20 +246,26 @@ return {
             ["<C-n>"] = { "select_next", "show" },
             ["<C-p>"] = { "select_prev", "show" },
             ["<Tab>"] = {
-                 function() return require("sidekick").nes_jump_or_apply() end,
-                 "snippet_forward", "select_next", "fallback"
+              function()
+                return require("sidekick").nes_jump_or_apply()
+              end,
+              "snippet_forward",
+              "select_next",
+              "fallback",
             },
           },
           completion = {
             ghost_text = { enabled = true },
             menu = {
-              auto_show = function() return vim.fn.getcmdtype() == ":" end, -- 仅在 : 命令模式显示
+              auto_show = function()
+                return vim.fn.getcmdtype() == ":"
+              end, -- 仅在 : 命令模式显示
             },
           },
         },
-        
+
         snippets = { preset = "luasnip" }, -- 指定使用 luasnip 引擎
-        
+
         -- === 补全源 ===
         sources = {
           -- 默认启用的源
@@ -240,7 +278,9 @@ return {
               module = "blink-copilot",
               async = true,
               score_offset = 100, -- 让 Copilot 排名靠前
-              enabled = function() return vim.g.copilot_enabled end,
+              enabled = function()
+                return vim.g.copilot_enabled
+              end,
               opts = {
                 max_completions = 3,
                 max_items = 2,
@@ -256,7 +296,7 @@ return {
         },
       }
     end,
-    
+
     config = function(_, opts)
       require("blink.cmp").setup(opts)
 
@@ -267,7 +307,11 @@ return {
         workspace = { fileOperations = { didRename = true, willRename = true } },
         textDocument = { foldingRange = { dynamicRegistration = false, lineFoldingOnly = true } },
       })
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities(capabilities, true))
+      capabilities = vim.tbl_deep_extend(
+        "force",
+        capabilities,
+        require("blink.cmp").get_lsp_capabilities(capabilities, true)
+      )
 
       -- 更新所有 LSP 的配置
       vim.lsp.config("*", {

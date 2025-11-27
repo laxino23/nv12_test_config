@@ -1,2 +1,2 @@
-require "config" 
-require "current-theme"
+require("config")
+require("current-theme")
