@@ -1,177 +1,179 @@
 {
-  "Lua Class": {
-    "prefix": "class",
-    "body": [
-      "local ${1:$TM_FILENAME_BASE} = {}",
-      "${1:$TM_FILENAME_BASE}.__index = ${1:$TM_FILENAME_BASE}",
-      "",
-      "function ${1:$TM_FILENAME_BASE}.new(${2:args})",
-      "\tlocal self = setmetatable({}, ${1:$TM_FILENAME_BASE})",
-      "\t$0",
-      "\treturn self",
-      "end",
-      "",
-      "function ${1:$TM_FILENAME_BASE}:destroy()",
-      "\t",
-      "end",
-      "",
-      "return ${1:$TM_FILENAME_BASE}"
-    ],
-    "description": "创建一个 Lua 类模板"
-  },
   "Function": {
-    "prefix": "func",
-    "body": ["function ${1:name}(${2:args})", "\t$0", "end"],
-    "description": "定义一个函数"
+    "prefix": "fn",
+    "body": ["local function ${1:name}(${2:args})", "\t${3:-- body}", "end"],
+    "description": "Create a local function"
   },
-  "Local Function": {
-    "prefix": "lfunc",
-    "body": ["local function ${1:name}(${2:args})", "\t$0", "end"],
-    "description": "定义一个局部函数"
+  "Anonymous Function": {
+    "prefix": "afn",
+    "body": ["function(${1:args})", "\t${2:-- body}", "end"],
+    "description": "Create an anonymous function"
   },
-  "Method": {
-    "prefix": "method",
-    "body": [
-      "function ${1:ClassName}:${2:methodName}(${3:args})",
-      "\t$0",
-      "end"
-    ],
-    "description": "定义一个类方法"
+  "Arrow Function": {
+    "prefix": "lam",
+    "body": "function(${1:args}) ${2:return} end",
+    "description": "Create a lambda/arrow function"
+  },
+  "Local Variable": {
+    "prefix": "loc",
+    "body": "local ${1:name} = ${2:value}",
+    "description": "Create a local variable"
   },
   "If Statement": {
     "prefix": "if",
-    "body": ["if ${1:condition} then", "\t$0", "end"],
-    "description": "if 条件语句"
+    "body": ["if ${1:condition} then", "\t${2:-- body}", "end"],
+    "description": "If statement"
   },
   "If-Else Statement": {
     "prefix": "ife",
-    "body": ["if ${1:condition} then", "\t$2", "else", "\t$0", "end"],
-    "description": "if-else 条件语句"
-  },
-  "If-Elseif-Else Statement": {
-    "prefix": "ifelif",
     "body": [
       "if ${1:condition} then",
-      "\t$2",
-      "elseif ${3:condition} then",
-      "\t$4",
+      "\t${2:-- if body}",
       "else",
-      "\t$0",
+      "\t${3:-- else body}",
       "end"
     ],
-    "description": "if-elseif-else 条件语句"
+    "description": "If-else statement"
   },
-  "For Loop (Numeric)": {
-    "prefix": "fori",
-    "body": ["for ${1:i} = ${2:1}, ${3:10}, ${4:1} do", "\t$0", "end"],
-    "description": "数值型 for 循环"
+  "For Loop (numeric)": {
+    "prefix": "for",
+    "body": ["for ${1:i} = ${2:1}, ${3:10} do", "\t${4:-- body}", "end"],
+    "description": "Numeric for loop"
   },
   "For Loop (ipairs)": {
-    "prefix": "forp",
-    "body": ["for ${1:i}, ${2:v} in ipairs(${3:table}) do", "\t$0", "end"],
-    "description": "使用 ipairs 遍历数组"
+    "prefix": "fori",
+    "body": [
+      "for ${1:i}, ${2:v} in ipairs(${3:table}) do",
+      "\t${4:-- body}",
+      "end"
+    ],
+    "description": "For loop with ipairs"
   },
   "For Loop (pairs)": {
-    "prefix": "forpairs",
-    "body": ["for ${1:k}, ${2:v} in pairs(${3:table}) do", "\t$0", "end"],
-    "description": "使用 pairs 遍历表"
+    "prefix": "forp",
+    "body": [
+      "for ${1:k}, ${2:v} in pairs(${3:table}) do",
+      "\t${4:-- body}",
+      "end"
+    ],
+    "description": "For loop with pairs"
   },
   "While Loop": {
     "prefix": "while",
-    "body": ["while ${1:condition} do", "\t$0", "end"],
-    "description": "while 循环"
+    "body": ["while ${1:condition} do", "\t${2:-- body}", "end"],
+    "description": "While loop"
   },
-  "Repeat-Until Loop": {
-    "prefix": "repeat",
-    "body": ["repeat", "\t$0", "until ${1:condition}"],
-    "description": "repeat-until 循环"
-  },
-  "Require Module": {
+  "Require": {
     "prefix": "req",
-    "body": ["local ${1:module} = require('${2:moduleName}')"],
-    "description": "引入模块"
+    "body": "local ${1:module} = require(\"${2:module}\")",
+    "description": "Require a module"
   },
-  "Module Export": {
-    "prefix": "module",
-    "body": ["local M = {}", "", "$0", "", "return M"],
-    "description": "模块导出模板"
+  "Lua require setup full": {
+    "prefix": "reqsetup",
+    "body": ["require(\"${1:module}\").setup({", "  ${2}", "})$0"],
+    "description": "require setup"
+  },
+  "Protected Call": {
+    "prefix": "pcall",
+    "body": [
+      "local ok, ${1:result} = pcall(${2:func}, ${3:args})",
+      "if not ok then",
+      "\t${4:-- handle error}",
+      "end"
+    ],
+    "description": "Protected call with error handling"
+  },
+  "Table": {
+    "prefix": "tbl",
+    "body": ["local ${1:name} = {", "\t${2:-- content}", "}"],
+    "description": "Create a table"
+  },
+  "Module": {
+    "prefix": "mod",
+    "body": ["local M = {}", "", "${1:-- module content}", "", "return M"],
+    "description": "Create a module"
+  },
+  "Vim Keymap": {
+    "prefix": "vmap",
+    "body": "vim.keymap.set(\"${1:n}\", \"${2:<leader>}\", ${3:function}, { desc = \"${4:description}\" })",
+    "description": "Set a vim keymap"
+  },
+  "Vim API Autocmd": {
+    "prefix": "vau",
+    "body": [
+      "vim.api.nvim_create_autocmd(\"${1:event}\", {",
+      "\tpattern = \"${2:*}\",",
+      "\tcallback = function()",
+      "\t\t${3:-- body}",
+      "\tend,",
+      "})"
+    ],
+    "description": "Create an autocmd"
+  },
+  "Vim API Command": {
+    "prefix": "vcmd",
+    "body": [
+      "vim.api.nvim_create_user_command(\"${1:CommandName}\", function(${2:opts})",
+      "\t${3:-- body}",
+      "end, { desc = \"${4:description}\" })"
+    ],
+    "description": "Create a user command"
   },
   "Print Debug": {
     "prefix": "pr",
-    "body": ["print(${1:value})"],
-    "description": "打印调试信息"
-  },
-  "Print with Format": {
-    "prefix": "printf",
-    "body": ["print(string.format('${1:%s}', ${2:value}))"],
-    "description": "格式化打印"
-  },
-  "Table Insert": {
-    "prefix": "tinsert",
-    "body": ["table.insert(${1:table}, ${2:value})"],
-    "description": "向表中插入元素"
-  },
-  "Table Remove": {
-    "prefix": "tremove",
-    "body": ["table.remove(${1:table}, ${2:index})"],
-    "description": "从表中移除元素"
-  },
-  "Table Concat": {
-    "prefix": "tconcat",
-    "body": ["table.concat(${1:table}, '${2:,}')"],
-    "description": "连接表中的字符串"
-  },
-  "Local Variable": {
-    "prefix": "local",
-    "body": ["local ${1:name} = ${2:value}"],
-    "description": "定义局部变量"
-  },
-  "Pcall (Protected Call)": {
-    "prefix": "pcall",
-    "body": [
-      "local success, result = pcall(function()",
-      "\t$0",
-      "end)",
-      "if not success then",
-      "\tprint('Error:', result)",
-      "end"
-    ],
-    "description": "受保护的函数调用"
-  },
-  "Assert": {
-    "prefix": "assert",
-    "body": ["assert(${1:condition}, '${2:error message}')"],
-    "description": "断言语句"
-  },
-  "String Format": {
-    "prefix": "format",
-    "body": ["string.format('${1:%s}', ${2:value})"],
-    "description": "字符串格式化"
-  },
-  "Metatable": {
-    "prefix": "meta",
-    "body": [
-      "local mt = {",
-      "\t__index = function(t, k)",
-      "\t\t$0",
-      "\tend,",
-      "\t__newindex = function(t, k, v)",
-      "\t\t",
-      "\tend",
-      "}",
-      "setmetatable(${1:table}, mt)"
-    ],
-    "description": "设置元表"
+    "body": "print(vim.inspect(${1:variable}))",
+    "description": "Print and inspect a variable"
   },
   "Comment Block": {
-    "prefix": "comment",
+    "prefix": "cmt",
     "body": [
-      "--[[",
-      " * ${1:Description}",
-      " * @param ${2:paramName} ${3:type} ${4:description}",
-      " * @return ${5:type} ${6:description}",
-      "]]"
+      "---${1:description}",
+      "---@param ${2:param} ${3:type}",
+      "---@return ${4:type}"
     ],
-    "description": "多行注释块"
+    "description": "Function documentation comment"
+  },
+  "Try-Catch Pattern": {
+    "prefix": "try",
+    "body": [
+      "local success, ${1:result} = pcall(function()",
+      "\t${2:-- try block}",
+      "end)",
+      "",
+      "if not success then",
+      "\t${3:-- catch block}",
+      "end"
+    ],
+    "description": "Try-catch pattern using pcall"
+  },
+  "String Format": {
+    "prefix": "fmt",
+    "body": "string.format(\"${1:%s}\", ${2:args})",
+    "description": "String format"
+  },
+  "Table Insert": {
+    "prefix": "tins",
+    "body": "table.insert(${1:table}, ${2:value})",
+    "description": "Insert into table"
+  },
+  "Vim Option": {
+    "prefix": "vopt",
+    "body": "vim.opt.${1:option} = ${2:value}",
+    "description": "Set vim option"
+  },
+  "Vim Global": {
+    "prefix": "vg",
+    "body": "vim.g.${1:variable} = ${2:value}",
+    "description": "Set vim global variable"
+  },
+  "Lua vim.pack.add minimal src only": {
+    "prefix": "pack",
+    "body": ["vim.pack.add({", "  { src = \"https://github.com/\" }", "})"],
+    "description": "multiline add a package"
+  },
+  "Lua vim.pack.add one-liner": {
+    "prefix": "packsrc",
+    "body": "{ src = \"https://github.com/\" }",
+    "description": "singleline ad a package"
   }
 }
