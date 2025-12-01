@@ -13,74 +13,66 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
   group = vim.api.nvim_create_augroup("SetupCompletion", { clear = true }),
   once = true,
   callback = function()
-    -- 2. SETUP COMPATIBILITY LAYER (Required before blink.cmp setup)
     require("blink.compat").setup({ impersonate_nvim_cmp = true })
 
-    -- 3. SETUP SUPERMAVEN
-    -- We disable the native ghost text so Blink handles the UI
     require("supermaven-nvim").setup({
       disable_inline_completion = true,
       disable_keymaps = true,
       keymaps = {
         accept_suggestion = "<C-a>",
-        clear_suggestion = "<Esc>",
         accept_word = "<C-w>",
+        -- Removed Esc to avoid conflicts
       },
-      color = {
-        suggestion_color = "#ffffff",
-        cterm = 244,
-      },
+      color = { suggestion_color = "#ffffff", cterm = 244 },
       log_level = "info",
     })
 
-    -- 4. SETUP BLINK
     require("blink.cmp").setup({
-      -- Completion UI
       completion = {
-        documentation = {
-          auto_show = true,
-          window = { border = "single", scrollbar = false },
-        },
+        documentation = { auto_show = true, window = { border = "single", scrollbar = false } },
         menu = {
           border = "single",
           auto_show = true,
           auto_show_delay_ms = 0,
-          scrollbar = false,
         },
       },
-      snippets = {
-        preset = "luasnip", -- the engine
-      },
-      -- Keymaps
+      snippets = { preset = "luasnip" },
+
+      -- 1. INSERT MODE KEYMAPS
       keymap = {
         preset = "default",
         ["<C-u>"] = { "scroll_documentation_up", "fallback" },
         ["<C-d>"] = { "scroll_documentation_down", "fallback" },
         ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
-        ["<CR>"] = { "accept", "fallback" },
-        ["<Tab>"] = {
-          "snippet_forward",
-          "select_next",
-          "fallback",
-        },
-        ["<S-Tab>"] = {
-          "snippet_backward",
-          "select_prev",
-          "fallback",
-        },
+        ["<CR>"] = { "select_and_accept", "fallback" },
+        ["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
+        ["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
       },
 
-      -- Function Signature Help
-      signature = {
-        enabled = true,
-        window = {
-          show_documentation = false,
-          border = "single",
-        },
-      },
-      -- Cmdline UI
+      signature = { enabled = true, window = { border = "single" } },
+
+      -- 2. CMDLINE CONFIGURATION
       cmdline = {
-        completion = { menu = { auto_show = true } },
+        completion = {
+          menu = { auto_show = true },
+        },
+        -- KEYMAPS MUST BE DEFINED HERE FOR CMDLINE
+        keymap = {
+          preset = "cmdline",
+          -- [Enter Logic]
+          -- If menu is open: select first item & accept (do not execute command)
+          -- If menu is closed: fallback (execute command)
+          ["<CR>"] = { "select_and_accept", "fallback" },
+
+          -- [Esc Logic]
+          -- If menu is open: close menu (stay in cmdline)
+          -- If menu is closed: fallback (exit cmdline)
+          ["<Esc>"] = { "cancel", "fallback" },
+
+          -- [Tab Logic for Cmdline]
+          ["<Tab>"] = { "show", "select_next", "fallback" },
+          ["<S-Tab>"] = { "select_prev", "fallback" },
+        },
         sources = function()
           local type = vim.fn.getcmdtype()
           if type == "/" or type == "?" then
@@ -92,7 +84,6 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
           return {}
         end,
       },
-      -- customized source
       sources = source,
     })
   end,

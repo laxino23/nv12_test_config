@@ -166,3 +166,5 @@ vim.api.nvim_create_user_command("ScreenkeyToggle", function()
   -- 切换开关
   require("screenkey").toggle()
 end, {})
+
+vim.keymap.set("n", "<leader>uk", ":ScreenkeyToggle<CR>", { desc = "Screenkey Toggle" })

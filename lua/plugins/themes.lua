@@ -1,5 +1,15 @@
 vim.pack.add({
   { src = "https://github.com/catppuccin/nvim" },
+  { src = "https://github.com/maxmx03/fluoromachine.nvim" },
+})
+
+local fm = require("fluoromachine")
+
+fm.setup({
+  glow = true,
+  theme = "fluoromachine",
+  transparent = false,
+  brightness = 0.05,
 })
 
 require("catppuccin").setup({
@@ -12,13 +22,12 @@ require("catppuccin").setup({
       enabled = true,
       indentscope_color = "sky",
     },
-    -- noice = true,
-    -- -- overseer = true,
-    -- telescope = {
-    -- 	enabled = true,
-    -- 	-- style = "nvchad",
-    -- },
-    -- notify = true,
+    noice = true,
+    overseer = true,
+    telescope = {
+      enabled = true,
+      style = "nvchad",
+    },
     treesitter = true,
     gitsigns = true,
     flash = true,
@@ -30,9 +39,6 @@ require("catppuccin").setup({
     mocha = function(mocha)
       return {
         CursorLineNr = { fg = mocha.yellow },
-        -- TelescopeSelection = { bg = mocha.surface0 },
-        -- TelescopeSelectionCaret = { fg = mocha.yellow, bg = mocha.surface0 },
-        -- TelescopePromptPrefix = { fg = mocha.yellow },
         FlashCurrent = { bg = mocha.peach, fg = mocha.base },
         FlashMatch = { bg = mocha.red, fg = mocha.base },
         FlashLabel = { bg = mocha.teal, fg = mocha.base },
@@ -46,5 +52,6 @@ require("catppuccin").setup({
   },
 })
 vim.cmd("colorscheme catppuccin")
+-- vim.cmd.colorscheme("fluoromachine")
 vim.cmd.hi("statusline guibg=NONE")
 vim.cmd.hi("Comment gui=none")

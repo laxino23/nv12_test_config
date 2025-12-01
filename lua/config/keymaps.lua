@@ -35,6 +35,7 @@ end
 map({
   ["save"] = { "n", "<leader>ww", ":w<CR>" },
   ["save-and-quit"] = { "n", "<leader>wq", ":wq<CR>" },
+  ["just-quit"] = { "n", "<leader>we", ":q<CR>" },
   ["update-and-source"] = { "n", "<leader>o", ":update<CR> :source<CR>" }, -- 保存并重载配置
 }, { silent = true })
 
@@ -304,6 +305,8 @@ local function redo()
   vim.cmd("redo")
 end
 
+-- disable undo
+vim.keymap.set("n", "u", "<Nop>", { noremap = true, silent = true })
 map({
   ["undo"] = { { "n", "i", "v", "t", "c" }, "<C-z>", undo },
   ["redo"] = { { "n", "i", "v", "t", "c" }, "<C-r>", redo },

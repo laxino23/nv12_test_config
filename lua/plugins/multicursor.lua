@@ -1,61 +1,72 @@
--- 添加 multicursor.nvim 插件
 vim.pack.add({
   { src = "https://github.com/jake-stewart/multicursor.nvim" },
 })
 
--- 加载插件模块
-local mc = require("multicursor-nvim")
+local status, mc = pcall(require, "multicursor-nvim")
+if not status then
+  return
+end
+mc.setup()
 
--- 在首次进入 Insert 模式时初始化（避免重复调用）
-vim.api.nvim_create_autocmd("InsertEnter", {
-  once = true, -- 只执行一次
-  callback = function()
-    mc.setup({}) -- 初始化多光标功能
-  end,
+local map = require("config.keymaps").map
+map({
+  -- === 基础操作 ===
+  ["multicursor-add-cursor"] = { { "n", "x" }, "mm", mc.addCursor },
+  ["multicursor-toggle"] = { { "n", "x" }, "<leader>up", mc.toggleCursor },
+
+  -- === 行操作 (添加) ===
+  ["multicursor-add-up"] = {
+    { "n", "x" },
+    "<up>",
+    function()
+      mc.lineAddCursor(-1)
+    end,
+  },
+  ["multicursor-add-down"] = {
+    { "n", "x" },
+    "<down>",
+    function()
+      mc.lineAddCursor(1)
+    end,
+  },
+
+  -- === 行操作 (跳过) ===
+  ["multicursor-skip-up"] = {
+    { "n", "x" },
+    "<leader><up>",
+    function()
+      mc.lineSkipCursor(-1)
+    end,
+  },
+  ["multicursor-skip-down"] = {
+    { "n", "x" },
+    "<leader><down>",
+    function()
+      mc.lineSkipCursor(1)
+    end,
+  },
+
+  -- === 匹配操作 ===
+  ["multicursor-match-next"] = {
+    { "n", "x" },
+    "<C-d>",
+    function()
+      mc.matchAddCursor(1)
+    end,
+  },
+  ["multicursor-match-prev"] = {
+    { "n", "x" },
+    "<C-u>",
+    function()
+      mc.matchAddCursor(-1)
+    end,
+  },
+
+  -- === 鼠标操作 ===
+  ["multicursor-mouse-click"] = { "n", "<c-leftmouse>", mc.handleMouse },
+  ["multicursor-mouse-drag"] = { "n", "<c-leftdrag>", mc.handleMouseDrag },
+  ["multicursor-mouse-release"] = { "n", "<c-leftrelease>", mc.handleMouseRelease },
 })
-
-local set = vim.keymap.set
-
--- 在当前光标位置添加一个新光标
-set({ "n", "x" }, "mm", function()
-  mc.addCursor()
-end, { desc = "在当前光标处添加 multicursor" })
-
--- 在上一行 / 下一行添加或移除光标
-set({ "n", "x" }, "<up>", function()
-  mc.lineAddCursor(-1)
-end, { desc = "在上一行添加光标" })
-set({ "n", "x" }, "<down>", function()
-  mc.lineAddCursor(1)
-end, { desc = "在下一行添加光标" })
-
--- 跳过上一行 / 下一行（不添加光标）
-set({ "n", "x" }, "<leader><up>", function()
-  mc.lineSkipCursor(-1)
-end, { desc = "跳过上一行，不添加光标" })
-set({ "n", "x" }, "<leader><down>", function()
-  mc.lineSkipCursor(1)
-end, { desc = "跳过下一行，不添加光标" })
-
--- 根据单词或选择内容添加匹配的光标（向下）
-set({ "n", "x" }, "<C-d>", function()
-  mc.matchAddCursor(1)
-end, { desc = "根据选中内容向下匹配并添加光标" })
-
--- 根据单词或选择内容添加匹配的光标（向上）
-set({ "n", "x" }, "mmn", function()
-  mc.matchAddCursor(-1)
-end, { desc = "根据选中内容向上匹配并添加光标" })
-
--- 用鼠标 Ctrl + 左键 添加/拖动/释放 多光标
-set("n", "<c-leftmouse>", mc.handleMouse)
-set("n", "<c-leftdrag>", mc.handleMouseDrag)
-set("n", "<c-leftrelease>", mc.handleMouseRelease)
-
--- 启用或禁用 multicursor 功能
-set({ "n", "x" }, "<leader>up", mc.toggleCursor, { desc = "启用/禁用 multicursor" })
-
--- 多光标专用模式：只有在存在多个光标时，这些按键才生效
 mc.addKeymapLayer(function(layerSet)
   -- 切换主光标（上一个/下一个）
   layerSet({ "n", "x" }, "[p", mc.prevCursor)

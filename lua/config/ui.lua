@@ -209,6 +209,14 @@ M.icons = {
     modified = " ",
     removed = " ",
   },
+  fold = {
+    open = "",
+    close = "",
+    chevron = { open = "", close = "" },
+    arrow = { open = "", close = "" },
+    triangle = { open = "▼", close = "▶" },
+    plus_minus = { open = "", close = "" },
+  },
 }
 
 M.rainbow_colors = {

@@ -166,14 +166,14 @@ return {
     end,
     desc = "查找引用 (References)",
   },
-  -- ["LSP-Definitions"] = {
-  --   mode = "n",
-  --   lhs = "gtd",
-  --   rhs = function()
-  --     Snacks.picker.lsp_definitions()
-  --   end,
-  --   desc = "查找定义 (Definitions)",
-  -- },
+  ["LSP-Definitions"] = {
+    mode = "n",
+    lhs = "gtd",
+    rhs = function()
+      Snacks.picker.lsp_definitions()
+    end,
+    desc = "查找定义 (Definitions)",
+  },
   ["LSP-Implementations"] = {
     mode = "n",
     lhs = "gti",

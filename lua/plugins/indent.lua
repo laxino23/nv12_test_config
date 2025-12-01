@@ -120,13 +120,12 @@ vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
 
 -- This table is meant to be passed to require("snacks").setup()
 -- 这个表旨在传递给 require("snacks").setup()
--- Japanese: このテーブルは Snacks の設定（せってい）に使（つか）います。
 local M = {}
 M.indent = {
   enabled = false,
-  only_current = true,
+  only_current = false,
   only_scope = true,
-  char = "",
+  char = "",
   hl = {
     "SnacksIndentRed",
     "SnacksIndentYellow",
@@ -138,7 +137,7 @@ M.indent = {
   },
 }
 M.scope = {
-  enabled = false, -- Disabled / 已禁用
+  enabled = false,
   char = "║",
   underline = true,
   only_current = true,
@@ -153,7 +152,7 @@ M.scope = {
   },
 }
 M.chunk = {
-  enabled = false, -- Disabled / 已禁用
+  enabled = true,
   char = {
     corner_top = "╭",
     corner_bottom = "╰",
@@ -170,6 +169,15 @@ M.chunk = {
     "SnacksIndentChunkGreen",
     "SnacksIndentChunkViolet",
     "SnacksIndentChunkCyan",
+  },
+}
+M.animate = {
+  enabled = vim.fn.has("nvim-0.10") == 1,
+  style = "out",
+  easing = "linear",
+  duration = {
+    step = 20, -- ms per step
+    total = 500, -- maximum duration
   },
 }
 return M
