@@ -8,6 +8,10 @@
       "rev": "12518b284e1e3f7c6c703b346815968e1620bee2",
       "src": "https://github.com/gen740/SmoothCursor.nvim"
     },
+    "bamboo.nvim": {
+      "rev": "1309bc88bffcf1bedc3e84e7fa9004de93da774a",
+      "src": "https://github.com/ribru17/bamboo.nvim"
+    },
     "better-escape.nvim": {
       "rev": "19a38aab94961016430905ebec30d272a01e9742",
       "src": "https://github.com/max397574/better-escape.nvim"
@@ -199,6 +203,10 @@
     "visual-whitespace.nvim": {
       "rev": "2c2de32bb97620bcf4b3b78879c185315ee971dc",
       "src": "https://github.com/mcauley-penney/visual-whitespace.nvim"
+    },
+    "yanky.nvim": {
+      "rev": "04fc42b94305d94948c9c197f679336668af3292",
+      "src": "https://github.com/gbprod/yanky.nvim"
     }
   }
 }

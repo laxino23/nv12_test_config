@@ -19,5 +19,5 @@ use({
   "overseer",
   "noice",
   "multicursor",
-  "ufo",
+  "folding",
 })
