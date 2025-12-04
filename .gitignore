@@ -1,0 +1,72 @@
+# --- System & OS Files / 系统及操作系统文件 ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- Neovim Core / Neovim 核心文件 ---
+# Session files created by auto-session or manually
+# 自动或手动生成的会话文件
+Session.vim
+Sessionx.vim
+
+# Log files (e.g., from LSP or debuggers)
+# 日志文件 (通常来自 LSP 或调试器)
+*.log
+nvim.log
+
+# Temporary swap and backup files (if not disabled in config)
+# 临时交换文件和备份文件 (如果在配置中未禁用)
+*.swp
+*.swo
+*~
+
+# --- Plugins & Package Managers / 插件与包管理器 ---
+# Lazy.nvim: You usually WANT to track lazy-lock.json, but ignore the downloaded plugin code
+# Lazy.nvim: 通常需要保留 lazy-lock.json 以锁定版本，但要忽略下载的具体插件代码
+# lazy-lock.json  <-- Keep this commented out! (不要忽略这个！)
+
+# Mason (LSP/Linter installer) - if installed locally in your config folder
+# Mason (LSP 安装器) - 如果安装在配置文件夹内，则忽略
+.mason/
+mason-lock.json
+
+# --- Programming Languages / 编程语言相关 ---
+# Lua compiled files
+# Lua 编译后的文件
+*.luac
+
+# Python (Virtual environments and caches)
+# Python (虚拟环境和缓存)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Node.js (Crucial for your commitizen setup)
+# Node.js 依赖 (对于你的 commitizen 设置至关重要)
+node_modules/
+npm-debug.log*
+
+# --- Project Specific / 项目特定 ---
+# Private configuration folder (Option 2 from our earlier conversation)
+# 私有配置文件夹 (我们之前讨论的"选项2"，用于存放不想上传的独立仓库)
+private/
+secrets/
+
+# Environment variables
+# 环境变量文件
+.env
+
+# --- Tooling / 工具配置 ---
+# Stylua cache
+# Stylua 格式化工具缓存
+.stylua-cache/
+
+# Pre-commit hook internal cache
+# Pre-commit 钩子的内部缓存
+.pre-commit-config.yaml.save
