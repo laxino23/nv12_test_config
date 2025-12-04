@@ -1,7 +1,10 @@
 -- guide lines for cursorline
 local function set_transparent_guides()
-  vim.api.nvim_set_hl(0, "CursorLine", { bg = "NONE", underline = true, bold = true })
-  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#ff9e64", bold = true })
+  local pmenu_bg = vim.api.nvim_get_hl(0, { name = "Pmenu" }).bg
+  local bg_color = pmenu_bg and string.format("#%06x", pmenu_bg) or "#2c3248"
+
+  vim.api.nvim_set_hl(0, "CursorLine", { bg = bg_color, underline = true, bold = false })
+  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#ff9e64", bold = false })
   vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#1f1f1f", fg = "NONE" })
 end
 

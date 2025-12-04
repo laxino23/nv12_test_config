@@ -5,10 +5,36 @@ vim.pack.add({
   { src = "https://github.com/rafamadriz/friendly-snippets" },
   { src = "https://github.com/saghen/blink.compat", version = "main" },
   { src = "https://github.com/supermaven-inc/supermaven-nvim" },
-  { src = "https://github.com/saghen/blink.cmp", version = "v1.7.0" },
-  { src = "https://github.com/L3MON4D3/LuaSnip" },
+  { src = "https://github.com/saghen/blink.cmp", version = "*" },
+  { src = "https://github.com/L3MON4D3/LuaSnip", version = "v2.*" },
+})
+-- luasnip path to snippets
+local vscode_loader = require("luasnip.loaders.from_vscode")
+local luasnip_loader = require("luasnip.loaders.from_lua")
+local function find_friendly_snippets()
+  for _, path in ipairs(vim.api.nvim_list_runtime_paths()) do
+    if path:match("friendly%-snippets") then
+      return path
+    end
+  end
+  return nil
+end
+
+local friendly_path = find_friendly_snippets()
+local my_snippets = vim.fn.stdpath("config") .. "/snippets"
+
+local paths_to_load = { my_snippets }
+if friendly_path then
+  table.insert(paths_to_load, friendly_path)
+end
+
+vscode_loader.lazy_load({ paths = paths_to_load })
+
+luasnip_loader.lazy_load({
+  paths = { vim.fn.stdpath("config") .. "/lua/snippets" },
 })
 
+-- setup for other plugins
 vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
   group = vim.api.nvim_create_augroup("SetupCompletion", { clear = true }),
   once = true,
@@ -84,6 +110,8 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
           return {}
         end,
       },
+
+      -- 3. SOURCES
       sources = source,
     })
   end,

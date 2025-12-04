@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - Fix the changelog ([2a01980](2a0198039a2bfc0a546eac9afdd828520e0e03f7))
 - Fix the weird changelod ([8560682](856068275c835482f117dfb5b9e5cbf85b5e0fe1))
 - Git issues ([b4dfaa4](b4dfaa42ed5ca0cc6001a4da2c6df7a3620e3a2d))
-- Testing ([fd54a67](fd54a67c2dc16219ae8f43078a9f9a841f425987))
+- Testing ([7995525](7995525fc23226ebe9713f909ca71876efdb6927))
 
 ### 🐛 Bug Fixes
 
@@ -23,3 +23,7 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - *(.gitignore)* Fix the ignore file ([49afe39](49afe39321cd1d33e488565ea31356a771566c1a))
+
+### 🚀 Features
+
+- *(comment a fold)* Now can comment a fold in n and v without open it ([253ee49](253ee4911a02196122f192a635c9aaf1fd3b9d28))

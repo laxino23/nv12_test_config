@@ -2,7 +2,8 @@
   "plugins": {
     "LuaSnip": {
       "rev": "3732756842a2f7e0e76a7b0487e9692072857277",
-      "src": "https://github.com/L3MON4D3/LuaSnip"
+      "src": "https://github.com/L3MON4D3/LuaSnip",
+      "version": "'v2.*'"
     },
     "SmoothCursor.nvim": {
       "rev": "12518b284e1e3f7c6c703b346815968e1620bee2",
@@ -23,7 +24,7 @@
     "blink.cmp": {
       "rev": "327fff91fe6af358e990be7be1ec8b78037d2138",
       "src": "https://github.com/saghen/blink.cmp",
-      "version": "'v1.7.0'"
+      "version": "'*'"
     },
     "blink.compat": {
       "rev": "1454f14a8d855a578ceeba77c62538fa1459a67c",

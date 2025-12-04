@@ -1,4 +1,5 @@
 local M = {}
+M.helperFunction = {}
 
 local icons = require("config.ui").icons.fold
 
@@ -69,6 +70,12 @@ local lsp_annotation_patterns = {
   javascript = "^%s*//%s*@", -- JSDoc annotations
 }
 
+M.commentType = {
+  lsp_annotation_patterns = lsp_annotation_patterns,
+  filetype_comment_patterns = filetype_comment_patterns,
+  filetype_block_comment_patterns = filetype_block_comment_patterns,
+}
+
 -- Check if a line is a comment based on its text
 -- This function determines whether a given line of code is a comment line
 -- by matching it against the comment pattern for the specified filetype.
@@ -83,6 +90,7 @@ local function is_comment_line(line_text, filetype)
   end
   return line_text:match(pattern) ~= nil
 end
+M.helperFunction.is_comment_line = is_comment_line
 
 -- Check if a line is an LSP annotation
 -- This function checks if a line contains LSP annotations like type hints or
@@ -172,6 +180,7 @@ local function is_comment_block(bufnr, lnum, endLnum, filetype)
   end
   return true, false -- is_comment, not block_style
 end
+M.helperFunction.is_comment_block = is_comment_block
 
 -- Remove comment signs from a text string
 -- This function strips comment prefixes and decorators from a text string based on the filetype.
@@ -322,7 +331,7 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
   local filetype = vim.bo[ctx.bufnr].filetype
   -- Calculate how many lines are folded
   local fold_lines = endLnum - lnum
-  local suffix = string.format(" %s %d lines", icons.lines or "󰁂", fold_lines)
+  local suffix = string.format(" %s %d lines", icons.lines or " 󰁂 ", fold_lines)
   local sufWidth = vim.fn.strdisplaywidth(suffix)
   -- Check if this is a comment block and what style
   local is_comment, is_block_style = is_comment_block(ctx.bufnr, lnum, endLnum, filetype)
@@ -356,9 +365,9 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
     end
   end
   -- Add separator icon (omit indicator)
-  local separator = string.format(" %s ", icons.omit or "⋯")
+  local separator = string.format(" %s ", icons.omit or " ... ")
   local sepWidth = vim.fn.strdisplaywidth(separator)
-  table.insert(newVirtText, { separator, "UfoFoldedEllipsis" })
+  table.insert(newVirtText, { separator, "Comment" })
   -- Add last line content if there's more than one line
   if fold_lines > 0 then
     -- For block comments (--[[ ]]), skip the last line (closing bracket)
@@ -380,13 +389,13 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
           local last_line_width = 0
           for _, chunk in ipairs(last_line_chunks) do
             local text = chunk[1]
-            local hl = chunk[2]
+            -- local hl = chunk[2]
             local text_width = vim.fn.strdisplaywidth(text)
             if last_line_width + text_width > remaining_space then
               -- Truncate and add
               text = truncate(text, remaining_space - last_line_width)
               if text ~= "" then
-                table.insert(newVirtText, { text, hl })
+                table.insert(newVirtText, { text, "Comment" })
               end
               break
             else

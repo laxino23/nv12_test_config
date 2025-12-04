@@ -54,7 +54,7 @@ local function init_blink_indent()
       },
     },
     scope = {
-      enabled = true,
+      enabled = false,
       char = "║",
       priority = 1000,
       highlights = {

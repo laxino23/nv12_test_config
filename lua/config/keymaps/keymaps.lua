@@ -70,7 +70,8 @@ map({
 local comment = utils.comment
 
 map({
-  ["comment-line"] = { "n", "gcc", comment.comment_line },
+  ["smart-comment-toggle-normal"] = { "n", "gcc", comment.smart_toggle },
+  ["smart-comment-toggle-visual"] = { "x", "gc", comment.smart_toggle },
   ["comment-above"] = { "n", "gcO", comment.comment("above") },
   ["comment-below"] = { "n", "gco", comment.comment("below") },
   ["comment-end"] = { "n", "gcA", comment.comment("end") },
@@ -234,3 +235,11 @@ map({
   },
   ["join-lines"] = { { "n", "v" }, "J", line_manage.join_lines },
 }, { silent = true })
+
+-- ============================================================================
+-- Variable Case Switching (Snake -> Camel -> Pascal -> Kebab)
+-- ============================================================================
+-- local cycle_case = requre "config.keymaps.cycle_case".cycle_case
+-- map({
+-- ["cycle-variable-case"] = { "x", "<leader>uu", cycle_case },
+-- }, { silent = true })

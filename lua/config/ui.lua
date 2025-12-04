@@ -84,7 +84,6 @@ M.icons = {
     Value = " ",
     Variable = " ",
   },
-
   lazy_kind_icons = {
     Array = " ",
     Boolean = "󰨙 ",
@@ -173,7 +172,6 @@ M.icons = {
     StaticMethod = "󰰑",
     TypeAlias = "",
   },
-
   misc = {
     dots = "󰇘",
     bug = "",

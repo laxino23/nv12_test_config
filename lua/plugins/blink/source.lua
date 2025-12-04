@@ -2,6 +2,7 @@ local source = {
   default = { "supermaven", "lsp", "path", "snippets", "buffer" },
 
   providers = {
+    -- 1. Supermaven (AI 补全)
     supermaven = {
       name = "supermaven",
       module = "blink.compat.source",
@@ -9,10 +10,12 @@ local source = {
       async = true,
     },
 
+    -- 2. LSP (语言服务器)
     lsp = {
       fallbacks = { "buffer" },
     },
 
+    -- 3. Path (文件路径)
     path = {
       score_offset = 3,
       opts = {
@@ -25,25 +28,26 @@ local source = {
       },
     },
 
+    -- 4. Buffer (当前缓冲区文本)
     buffer = {
       min_keyword_length = 2,
     },
 
+    -- 5. Snippets (代码片段)
     snippets = {
       score_offset = 1000,
       should_show_items = function(ctx)
         return ctx.trigger.initial_kind ~= "trigger_character"
       end,
-      opts = {
-        friendly_snippets = true,
-        search_paths = { vim.fn.stdpath("config") .. "/snippets" },
-      },
     },
 
+    -- 6. Cmdline (命令行)
     cmdline = {
       name = "cmdline",
       module = "blink.cmp.sources.cmdline",
     },
+
+    -- 7. Thesaurus (同义词库 - 需要 blink-cmp-words 插件)
     thesaurus = {
       name = "blink-cmp-words",
       module = "blink-cmp-words.thesaurus",
@@ -54,6 +58,8 @@ local source = {
         similarity_depth = 2,
       },
     },
+
+    -- 8. Dictionary (字典 - 需要 blink-cmp-words 插件)
     dictionary = {
       name = "blink-cmp-words",
       module = "blink-cmp-words.dictionary",
@@ -65,6 +71,7 @@ local source = {
     },
   },
 
+  -- 针对特定文件类型的源配置
   per_filetype = {
     text = { "supermaven", "dictionary", "buffer", "path" },
     markdown = { "supermaven", "thesaurus", "dictionary", "snippets", "buffer", "path" },
