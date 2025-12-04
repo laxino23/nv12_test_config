@@ -1,92 +1,80 @@
-# git-cliff ~ configuration file
-# https://git-cliff.org/docs/configuration
-
-
 [changelog]
-# A Tera template to be rendered for each release in the changelog.
-# See https://keats.github.io/tera/docs/#introduction
+# 1. Header template
+# 1. 日志头部模板
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+"""
+
+# 2. Body template
+# 2. 日志主体模板 (Jinja2 syntax)
+# It iterates over releases -> groups -> commits
+# 遍历逻辑：版本 (releases) -> 分组 (groups) -> 提交 (commits)
 body = """
 {% if version %}\
     ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else %}\
-    ## [unreleased]
+    ## [Unreleased]
 {% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
-    ### {{ group | striptags | trim | upper_first }}
+    ### {{ group | upper_first }}
     {% for commit in commits %}
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
-            {{ commit.message | upper_first }}\
+            {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}]({{ commit.id }}))\
     {% endfor %}
-{% endfor %}
+{% endfor %}\n
 """
-# Remove leading and trailing whitespaces from the changelog's body.
+
+# 3. Footer template
+# 3. 底部模板
+footer = """
+"""
+
+# Remove leading/trailing whitespace
+# 去除生成内容的首尾空格
 trim = true
-# Render body even when there are no releases to process.
-render_always = true
-# An array of regex based postprocessors to modify the changelog.
-postprocessors = [
-  # Replace the placeholder <REPO> with a URL.
-  #{ pattern = '<REPO>', replace = "https://github.com/orhun/git-cliff" },
-]
-# render body even when there are no releases to process
-# render_always = true
-# output file path
-# output = "test.md"
 
 [git]
-# Parse commits according to the conventional commits specification.
-# See https://www.conventionalcommits.org
+# Parse commits strictly following Conventional Commits
+# 严格解析符合 Conventional Commits 规范的提交
 conventional_commits = true
-# Exclude commits that do not match the conventional commits specification.
-filter_unconventional = true
-# Require all commits to be conventional.
-# Takes precedence over filter_unconventional.
-require_conventional = false
-# Split commits on newlines, treating each line as an individual commit.
-split_commits = false
-# An array of regex based parsers to modify commit messages prior to further processing.
-commit_preprocessors = [
-  # Replace issue numbers with link templates to be updated in `changelog.postprocessors`.
-  #{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
-  # Check spelling of the commit message using https://github.com/crate-ci/typos.
-  # If the spelling is incorrect, it will be fixed automatically.
-  #{ pattern = '.*', replace_command = 'typos --write-changes -' },
-]
-# Prevent commits that are breaking from being excluded by commit parsers.
-protect_breaking_commits = false
-# An array of regex based parsers for extracting data from the commit message.
-# Assigns commits to groups.
-# Optionally sets the commit's scope and can decide to exclude commits from further processing.
+
+# Filter out non-conventional commits (optional, set true to hide "random" commits)
+# 过滤掉不符合规范的杂乱提交 (设为 true 则隐藏非规范提交)
+filter_unconventional = false
+
+# Regex parsers to group commits
+# 用于分组提交的正则表达式解析器
+# The "group" string determines the section header in the changelog
+# "group" 字段决定了生成的日志中的章节标题
 commit_parsers = [
-  { message = "^feat", group = "<!-- 0 -->🚀 Features" },
-  { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
-  { message = "^doc", group = "<!-- 3 -->📚 Documentation" },
-  { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
-  { message = "^refactor", group = "<!-- 2 -->🚜 Refactor" },
-  { message = "^style", group = "<!-- 5 -->🎨 Styling" },
-  { message = "^test", group = "<!-- 6 -->🧪 Testing" },
+  { message = "^feat", group = "🚀 Features" },
+  { message = "^fix", group = "🐛 Bug Fixes" },
+  { message = "^doc", group = "📚 Documentation" },
+  { message = "^perf", group = "⚡ Performance" },
+  { message = "^refactor", group = "🚜 Refactor" },
+  { message = "^style", group = "🎨 Styling" },
+  { message = "^test", group = "🧪 Testing" },
   { message = "^chore\\(release\\): prepare for", skip = true },
-  { message = "^chore\\(deps.*\\)", skip = true },
-  { message = "^chore\\(pr\\)", skip = true },
-  { message = "^chore\\(pull\\)", skip = true },
-  { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
-  { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
-  { message = "^revert", group = "<!-- 9 -->◀️ Revert" },
-  { message = ".*", group = "<!-- 10 -->💼 Other" },
+  { message = "^chore|^ci", group = "⚙️ Miscellaneous Tasks" },
+  { body = ".*security", group = "🛡️ Security" },
 ]
-# Exclude commits that are not matched by any commit parser.
+
+# Protect breaking changes from being skipped
+# 保护破坏性更新 (Breaking Changes) 不被忽略
+protect_breaking_commits = false
+
+# Filter out merge commits
+# 过滤掉合并提交
 filter_commits = false
-# An array of link parsers for extracting external references, and turning them into URLs, using regex.
-link_parsers = []
-# Include only the tags that belong to the current branch.
-use_branch_tags = false
-# Order releases topologically instead of chronologically.
+
+# Regex for matching git tags (e.g. v1.0.0)
+# 匹配 git 标签的正则
+tag_pattern = "v[0-9].*"
+
+# Sort order
+# 排序方式
 topo_order = false
-# Order releases topologically instead of chronologically.
-topo_order_commits = true
-# Order of commits in each group/release within the changelog.
-# Allowed values: newest, oldest
 sort_commits = "oldest"
-# Process submodules commits
-recurse_submodules = false
