@@ -13,5 +13,3 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - *(.gitignore)* Fix the ignore file ([49afe39](49afe39321cd1d33e488565ea31356a771566c1a))
-
-
