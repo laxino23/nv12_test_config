@@ -51,12 +51,7 @@ local opts = {
   dashboard = { enabled = true },
 }
 
-vim.api.nvim_create_autocmd("UIEnter", {
-  callback = function()
-    require("snacks").setup(opts)
-  end,
-  once = true,
-})
+require("snacks").setup(opts)
 
 local keys_ok, keys_module = pcall(require, "plugins.snacks.keymaps")
 if keys_ok and type(keys_module) == "table" then
