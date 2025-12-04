@@ -1,0 +1,19 @@
+{
+  "name": "nv12",
+  "version": "1.0.0",
+  "description": "-- [config structure](#1-basics-of-lua) -- [options and keymaps](#2-options-and-keymaps) -- [plugins manager](#3-plugins-manager) -- [syntax parser](#4-treesitter) -- [lsp](#6-lsp) -- [minis](#7-minis)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laxino23/nv12_test_config.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laxino23/nv12_test_config/issues"
+  },
+  "homepage": "https://github.com/laxino23/nv12_test_config#readme"
+}
