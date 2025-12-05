@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Fix the weird changelod ([8560682](856068275c835482f117dfb5b9e5cbf85b5e0fe1))
 - Git issues ([b4dfaa4](b4dfaa42ed5ca0cc6001a4da2c6df7a3620e3a2d))
 - Testing ([7995525](7995525fc23226ebe9713f909ca71876efdb6927))
+- Nothing ([7f8349e](7f8349e584ac29a47fa5b36d5e6444f891eb5c4e))
 
 ### 🐛 Bug Fixes
 
@@ -21,7 +22,8 @@ All notable changes to this project will be documented in this file.
 - The folding range does not matches ([88e54a8](88e54a829772e3b391a4c74305a2f2f22785da06))
 - *(fix the snip)* Now we can use snip in .lua ([38b447e](38b447eabf9cd5a7927b08f2e6fd3e939f153d4b))
 - *(mis add)* Deleted the mis-add file ([79207e2](79207e22b4b21edfad023633b33309a10395f3d6))
-- *(fix)* Fix the trailing comments for the fold ([6a5bc45](6a5bc452547fa1a9301622862403501b79729a8c))
+- *(fix)* Fix the trailing comments for the fold ([dd34df2](dd34df2606ff2b47bc53c2edfd66e19dfda9b18d))
+- Minor change ([9a38a84](9a38a84c65534cee64bcb31e0fa63364bb334630))
 
 ### 📚 Documentation
 
