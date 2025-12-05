@@ -19,7 +19,8 @@ All notable changes to this project will be documented in this file.
 - *(git)* Git modify ([f17acc8](f17acc8b1d6e0cd3910f442c9664f8df20206ec8))
 - Fix the snacks initiation ([eb2247c](eb2247c9adfc2aeebe06efb6e043243882fc4c6b))
 - The folding range does not matches ([88e54a8](88e54a829772e3b391a4c74305a2f2f22785da06))
-- *(fix the snip)* Now we can use snip in .lua ([a001c77](a001c77c477ced2a6ac6da42f2eccdd02dc5ab79))
+- *(fix the snip)* Now we can use snip in .lua ([38b447e](38b447eabf9cd5a7927b08f2e6fd3e939f153d4b))
+- *(mis add)* Deleted the mis-add file ([1618dd3](1618dd35fc8b068f5220d33aa2cece2d80db1834))
 
 ### 📚 Documentation
 
