@@ -20,7 +20,8 @@ All notable changes to this project will be documented in this file.
 - Fix the snacks initiation ([eb2247c](eb2247c9adfc2aeebe06efb6e043243882fc4c6b))
 - The folding range does not matches ([88e54a8](88e54a829772e3b391a4c74305a2f2f22785da06))
 - *(fix the snip)* Now we can use snip in .lua ([38b447e](38b447eabf9cd5a7927b08f2e6fd3e939f153d4b))
-- *(mis add)* Deleted the mis-add file ([1618dd3](1618dd35fc8b068f5220d33aa2cece2d80db1834))
+- *(mis add)* Deleted the mis-add file ([79207e2](79207e22b4b21edfad023633b33309a10395f3d6))
+- *(fix)* Fix the trailing comments for the fold ([6a5bc45](6a5bc452547fa1a9301622862403501b79729a8c))
 
 ### 📚 Documentation
 

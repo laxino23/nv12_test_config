@@ -239,7 +239,9 @@ map({
 -- ============================================================================
 -- Variable Case Switching (Snake -> Camel -> Pascal -> Kebab)
 -- ============================================================================
--- local cycle_case = requre "config.keymaps.cycle_case".cycle_case
--- map({
--- ["cycle-variable-case"] = { "x", "<leader>uu", cycle_case },
--- }, { silent = true })
+
+local cycle_case = utils.cycle_case
+
+map({
+  ["cycle-variable-case"] = { "x", "<leader>uu", cycle_case },
+}, { silent = true })
