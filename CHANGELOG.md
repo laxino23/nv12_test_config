@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - *(git)* Git modify ([f17acc8](f17acc8b1d6e0cd3910f442c9664f8df20206ec8))
 - Fix the snacks initiation ([eb2247c](eb2247c9adfc2aeebe06efb6e043243882fc4c6b))
 - The folding range does not matches ([88e54a8](88e54a829772e3b391a4c74305a2f2f22785da06))
+- *(fix the snip)* Now we can use snip in .lua ([a001c77](a001c77c477ced2a6ac6da42f2eccdd02dc5ab79))
 
 ### 📚 Documentation
 
@@ -26,4 +27,4 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
-- *(comment a fold)* Now can comment a fold in n and v without open it ([253ee49](253ee4911a02196122f192a635c9aaf1fd3b9d28))
+- *(comment a fold)* Now can comment a fold in n and v without open it ([fbee652](fbee6520ffdcdc5098780792f4a90b51620d1e31))
