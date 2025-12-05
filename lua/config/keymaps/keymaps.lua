@@ -9,13 +9,61 @@ local map = utils.map
 -- ============================================================================
 -- Basic Operations / 基础操作
 -- ============================================================================
-
-map({
-  ["save"] = { "n", "<leader>ww", ":w<CR>" },
-  ["save-and-quit"] = { "n", "<leader>wq", ":wq<CR>" },
-  ["just-quit"] = { "n", "<leader>we", ":q<CR>" },
-  ["update-and-source"] = { "n", "<leader>o", ":update<CR> :source<CR>" },
-}, { silent = true })
+-- local persistence = require("persistence")
+-- map({
+-- -- 普通保存（不变）
+-- ["save"] = { "n", "<leader>ww", ":w<CR>" },
+--
+-- -- 保存文件 + 保存会话 + 退出
+-- ["save-and-quit"] = {
+-- "n",
+-- "<leader>wq",
+-- function()
+-- vim.cmd("w") -- 保存当前文件
+-- persistence.save() -- 手动确保会话被保存（虽然退出时也会自动，但提前保存更可靠）
+-- vim.cmd("qa!") -- 用 qa! 强制退出所有窗口（比 q 更彻底）
+-- end,
+-- },
+--
+-- -- 仅退出，不保存会话（临时离开或实验时用）
+-- ["quit-without-session"] = {
+-- "n",
+-- "<leader>we",
+-- function()
+-- persistence.stop() -- 阻止本次退出时保存会话
+-- vim.cmd("qa!") -- 退出所有
+-- end,
+-- },
+--
+-- -- 强制退出（连当前文件都不保存，也不保存会话）
+-- ["force-quit"] = {
+-- "n",
+-- "<leader>wq!",
+-- function()
+-- persistence.stop()
+-- vim.cmd("qa!")
+-- end,
+-- },
+--
+-- -- 只保存当前会话（不退出，手动触发时很有用）
+-- ["session-save"] = { "n", "<leader>qs", persistence.save, "手动保存当前会话" },
+--
+-- -- 恢复当前目录的会话
+-- ["session-load"] = { "n", "<leader>ql", persistence.load, "恢复当前项目会话" },
+--
+-- -- 恢复上一次全局会话（跨项目）
+-- ["session-load-last"] = {
+-- "n",
+-- "<leader>qL",
+-- function()
+-- persistence.load({ last = true })
+-- end,
+-- "恢复最后一次会话",
+-- },
+--
+-- -- 取消本次会话自动保存（临时配置时用）
+-- ["session-stop"] = { "n", "<leader>qd", persistence.stop, "本次退出不保存会话" },
+-- }, { silent = true })
 
 -- ============================================================================
 -- Line Movement / 行移动
@@ -26,28 +74,28 @@ local lineMovement = utils.lineMovement
 map({
   ["move-selection-down"] = {
     "x",
-    "<M-Down>",
+    "<M-j>",
     function()
       lineMovement.move_visual_selection("down")
     end,
   },
   ["move-selection-up"] = {
     "x",
-    "<M-Up>",
+    "<M-k>",
     function()
       lineMovement.move_visual_selection("up")
     end,
   },
   ["move-line-down"] = {
     "n",
-    "<M-Down>",
+    "<M-j>",
     function()
       lineMovement.move_normal_selection("down")
     end,
   },
   ["move-line-up"] = {
     "n",
-    "<M-Up>",
+    "<M-k>",
     function()
       lineMovement.move_normal_selection("up")
     end,
@@ -92,7 +140,7 @@ map({
 
 map({
   ["paste-without-yank"] = { "x", "p", '"_dP' },
-  ["delete-without-yank"] = { { "n", "v" }, "D", '"_d' },
+  ["delete-without-yank"] = { { "n", "v" }, "d", '"_d' },
 }, { silent = true, remap = false })
 
 -- ============================================================================

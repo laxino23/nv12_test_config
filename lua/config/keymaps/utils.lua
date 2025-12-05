@@ -52,8 +52,8 @@ end
 M.lineMovement.move_normal_selection = function(direction)
   local cur = vim.fn.line(".")
   local start_line, end_line
-
   local fold_start = vim.fn.foldclosed(cur)
+
   if fold_start ~= -1 then
     start_line = fold_start
     end_line = vim.fn.foldclosedend(cur)
@@ -69,10 +69,8 @@ M.lineMovement.move_normal_selection = function(direction)
     local next_line = end_line + 1
     local next_start = vim.fn.foldclosed(next_line)
     local next_end = (next_start ~= -1) and vim.fn.foldclosedend(next_line) or next_line
-
     vim.cmd(start_line .. "," .. end_line .. "m " .. next_end)
     vim.cmd(start_line .. "," .. end_line .. "=")
-
     local adjust = next_end - end_line
     vim.fn.cursor(cur + adjust, vim.fn.col("."))
   elseif direction == "up" then
@@ -80,9 +78,12 @@ M.lineMovement.move_normal_selection = function(direction)
       return
     end
     local prev_line = start_line - 1
-    local prev_start = vim.fn.foldclosed(prev_line)
+    local prev_start_fold = vim.fn.foldclosed(prev_line)
+    local prev_start = (prev_start_fold ~= -1) and prev_start_fold or prev_line
 
-    vim.cmd(start_line .. "," .. end_line .. "m " .. (prev_start - 1))
+    -- Calculate destination: prev_start - 1, ensuring it's >= 0
+    local dest = math.max(0, prev_start - 1)
+    vim.cmd(start_line .. "," .. end_line .. "m " .. dest)
 
     local new_start = prev_start
     local new_end = new_start + (end_line - start_line)
@@ -92,7 +93,6 @@ M.lineMovement.move_normal_selection = function(direction)
     vim.fn.cursor(cur - adjust, vim.fn.col("."))
   end
 end
-
 -- Move selection in Visual mode
 -- 可视模式下移动选区
 M.lineMovement.move_visual_selection = function(direction)
@@ -200,8 +200,8 @@ M.comment.comment_line = function()
   end
 end
 
--- Toggle comment for line or fold
--- 切换行或折叠的注释状态
+-- Toggle comment for line or fold (Simplified logic)
+-- 切换行或折叠的注释状态（简化逻辑）
 M.comment.toggle_fold_or_line = function()
   local current_line = vim.fn.line(".")
   local fold_start = vim.fn.foldclosed(current_line)
@@ -214,7 +214,6 @@ M.comment.toggle_fold_or_line = function()
 
   -- === CASE 2: In a closed fold ===
   local fold_end = vim.fn.foldclosedend(current_line)
-  local bufnr = vim.api.nvim_get_current_buf()
   local filetype = vim.bo.filetype
 
   -- Get fold text utilities
@@ -223,53 +222,69 @@ M.comment.toggle_fold_or_line = function()
   -- Open fold to inspect
   vim.cmd("normal! zo")
 
-  -- Check if it's a comment block and what style
-  local is_comment, is_block_style =
-    fold_utils.helper_function.is_comment_block(bufnr, fold_start, fold_end, filetype)
-
+  -- Get comment string from vim's commentstring option
   local line_comment = vim.bo.commentstring:gsub("%%s.*", ""):gsub("%s+$", "")
+
+  -- Get patterns for this filetype
   local line_pattern = fold_utils.comment_type.filetype_comment_patterns[filetype]
-  local block_pattern = fold_utils.comment_type.filetype_block_comment_patterns[filetype]
   local lsp_pattern = fold_utils.comment_type.lsp_annotation_patterns[filetype]
 
-  if is_block_style and block_pattern then
-    -- === CASE 2A: Block comment fold (--[[ ]]-- style) ===
-    -- Remove block comment markers
-    local first_line = vim.fn.getline(fold_start)
-    local last_line = vim.fn.getline(fold_end)
+  -- Fallback: if no pattern defined for this filetype, use a generic pattern
+  if not line_pattern then
+    -- Extract comment chars from commentstring and escape them for pattern matching
+    local comment_chars = line_comment:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+    line_pattern = "^%s*" .. comment_chars
+  end
 
-    -- Remove start marker (preserve indentation)
-    local indent = first_line:match("^%s*")
-    local new_first = first_line:gsub(block_pattern.start, indent, 1)
+  -- Check if ALL non-LSP lines have comment markers
+  local has_uncommented = false
+  for i = fold_start, fold_end do
+    local line = vim.fn.getline(i)
 
-    -- Remove end marker
-    local new_last = last_line:gsub(block_pattern.ending, "", 1)
+    -- Skip LSP annotations by inverting logic
+    if not (lsp_pattern and line:match(lsp_pattern)) then
+      -- Check if this line doesn't have a comment marker
+      if not line:match(line_pattern) then
+        has_uncommented = true
+        break
+      end
+    end
+  end
 
-    vim.fn.setline(fold_start, new_first)
-    vim.fn.setline(fold_end, new_last)
-
-    -- Format the range to help treesitter recognize it
-    vim.cmd(string.format("silent! %d,%d normal! ==", fold_start, fold_end))
-
-    -- Wait for treesitter to update, then try to close fold
-    vim.defer_fn(function()
-      -- Move cursor to fold start and try to close
-      vim.fn.cursor(fold_start, 1)
-      pcall(function()
-        vim.cmd("normal! zc")
-      end)
-    end, 50)
-  elseif is_comment then
-    -- === CASE 2B: Line comment fold (all lines are commented) ===
-    -- Uncomment all lines (except LSP annotations)
+  if has_uncommented then
+    -- === Add comment markers to ALL lines (except LSP annotations) ===
     for i = fold_start, fold_end do
       local line = vim.fn.getline(i)
-      local trimmed = vim.trim(line)
 
-      -- Skip empty lines and LSP annotations
-      if trimmed ~= "" and not (lsp_pattern and line:match(lsp_pattern)) then
-        if line_pattern and line:match(line_pattern) then
-          -- Remove comment sign
+      -- Process only if not LSP annotation
+      if not (lsp_pattern and line:match(lsp_pattern)) then
+        -- Add comment marker (preserve indentation)
+        local indent = line:match("^%s*") or ""
+        local content = line:sub(#indent + 1)
+
+        -- Don't add space after comment if line is empty or only has whitespace
+        local new_line
+        if content == "" or content:match("^%s*$") then
+          new_line = indent .. line_comment
+        else
+          new_line = indent .. line_comment .. " " .. content
+        end
+        vim.fn.setline(i, new_line)
+      end
+    end
+
+    -- After commenting, close the fold
+    vim.fn.cursor(fold_start, 1)
+    vim.cmd("normal! zc")
+  else
+    -- === Remove comment markers from ALL lines (except LSP annotations) ===
+    for i = fold_start, fold_end do
+      local line = vim.fn.getline(i)
+
+      -- Process only if not LSP annotation
+      if not (lsp_pattern and line:match(lsp_pattern)) then
+        -- Remove comment marker if present
+        if line:match(line_pattern) then
           local new_line = line:gsub(line_pattern .. "%s?", "", 1)
           vim.fn.setline(i, new_line)
         end
@@ -281,34 +296,11 @@ M.comment.toggle_fold_or_line = function()
 
     -- Wait for treesitter to update, then try to close fold
     vim.defer_fn(function()
-      -- Move cursor to fold start and try to close
       vim.fn.cursor(fold_start, 1)
       pcall(function()
         vim.cmd("normal! zc")
       end)
     end, 50)
-  else
-    -- === CASE 2C: Not a comment fold - comment all lines ===
-    -- Comment all non-empty lines (except LSP annotations)
-    for i = fold_start, fold_end do
-      local line = vim.fn.getline(i)
-      local trimmed = vim.trim(line)
-
-      if trimmed ~= "" and not (lsp_pattern and line:match(lsp_pattern)) then
-        if line_pattern and not line:match(line_pattern) then
-          -- Add comment sign (preserve indentation)
-          local indent = line:match("^%s*") or ""
-          local content = line:sub(#indent + 1)
-          local new_line = indent .. line_comment .. " " .. content
-          vim.fn.setline(i, new_line)
-        end
-      end
-    end
-
-    -- After commenting, manually create a fold with zf
-    -- Move to fold start and create fold to fold end
-    vim.fn.cursor(fold_start, 1)
-    vim.cmd(string.format("normal! V%dGzf", fold_end))
   end
 end
 
@@ -323,44 +315,153 @@ M.comment.smart_toggle = function()
     vim.cmd("normal! \27") -- Exit visual mode to capture marks
     local start_line = vim.fn.line("'<")
     local end_line = vim.fn.line("'>")
+    local filetype = vim.bo.filetype
 
-    -- Check if any line in the selection is part of a fold
-    local has_fold = false
-    local fold_ranges = {} -- Store all fold ranges in selection
+    -- Get fold text utilities
+    local fold_utils = require("plugins.folding.utils")
+    local line_comment = vim.bo.commentstring:gsub("%%s.*", ""):gsub("%s+$", "")
+    local line_pattern = fold_utils.comment_type.filetype_comment_patterns[filetype]
+    local lsp_pattern = fold_utils.comment_type.lsp_annotation_patterns[filetype]
+
+    -- Fallback pattern if needed
+    if not line_pattern then
+      local comment_chars = line_comment:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+      line_pattern = "^%s*" .. comment_chars
+    end
+
+    -- Collect all fold ranges and non-fold lines
+    local fold_ranges = {}
+    local non_fold_lines = {}
+    local processed_lines = {}
 
     for lnum = start_line, end_line do
-      local fold_start = vim.fn.foldclosed(lnum)
-      if fold_start ~= -1 then
-        local fold_end = vim.fn.foldclosedend(lnum)
-        -- Check if we haven't already recorded this fold
-        local already_recorded = false
-        for _, range in ipairs(fold_ranges) do
-          if range.start == fold_start and range.ending == fold_end then
-            already_recorded = true
-            break
-          end
-        end
-        if not already_recorded then
+      if not processed_lines[lnum] then
+        local fold_start = vim.fn.foldclosed(lnum)
+        if fold_start ~= -1 then
+          local fold_end = vim.fn.foldclosedend(lnum)
           table.insert(fold_ranges, { start = fold_start, ending = fold_end })
-          has_fold = true
+          -- Mark all lines in this fold as processed
+          for i = fold_start, fold_end do
+            processed_lines[i] = true
+          end
+        else
+          table.insert(non_fold_lines, lnum)
+          processed_lines[lnum] = true
         end
       end
     end
 
-    if has_fold then
-      -- Handle multiple folds in selection
+    -- Determine if we should comment or uncomment based on ALL lines in selection
+    local has_uncommented = false
+
+    -- Check folds
+    for _, fold_range in ipairs(fold_ranges) do
+      vim.fn.cursor(fold_range.start, 1)
+      vim.cmd("normal! zo") -- Open to check
+
+      for i = fold_range.start, fold_range.ending do
+        local line = vim.fn.getline(i)
+        if not (lsp_pattern and line:match(lsp_pattern)) then
+          if not line:match(line_pattern) then
+            has_uncommented = true
+            break
+          end
+        end
+      end
+
+      vim.fn.cursor(fold_range.start, 1)
+      vim.cmd("normal! zc") -- Close it back
+
+      if has_uncommented then
+        break
+      end
+    end
+
+    -- Check non-fold lines
+    if not has_uncommented then
+      for _, lnum in ipairs(non_fold_lines) do
+        local line = vim.fn.getline(lnum)
+        local trimmed = vim.trim(line)
+        if trimmed ~= "" then
+          if not (lsp_pattern and line:match(lsp_pattern)) then
+            if not line:match(line_pattern) then
+              has_uncommented = true
+              break
+            end
+          end
+        end
+      end
+    end
+
+    -- Now apply the same action to ALL folds and lines
+    if has_uncommented then
+      -- COMMENT everything
+      -- Handle folds
       for _, fold_range in ipairs(fold_ranges) do
         vim.fn.cursor(fold_range.start, 1)
-        M.comment.toggle_fold_or_line()
+        vim.cmd("normal! zo")
+
+        for i = fold_range.start, fold_range.ending do
+          local line = vim.fn.getline(i)
+          if not (lsp_pattern and line:match(lsp_pattern)) then
+            local indent = line:match("^%s*") or ""
+            local content = line:sub(#indent + 1)
+            local new_line = indent .. line_comment .. " " .. content
+            vim.fn.setline(i, new_line)
+          end
+        end
+
+        vim.fn.cursor(fold_range.start, 1)
+        vim.cmd("normal! zc")
+      end
+
+      -- Handle non-fold lines
+      for _, lnum in ipairs(non_fold_lines) do
+        local line = vim.fn.getline(lnum)
+        local trimmed = vim.trim(line)
+        if trimmed ~= "" then
+          if not (lsp_pattern and line:match(lsp_pattern)) then
+            local indent = line:match("^%s*") or ""
+            local content = line:sub(#indent + 1)
+            local new_line = indent .. line_comment .. " " .. content
+            vim.fn.setline(lnum, new_line)
+          end
+        end
       end
     else
-      -- No folds, just toggle comments on the range
-      -- Use native commenting on each line
-      for lnum = start_line, end_line do
+      -- UNCOMMENT everything
+      -- Handle folds
+      for _, fold_range in ipairs(fold_ranges) do
+        vim.fn.cursor(fold_range.start, 1)
+        vim.cmd("normal! zo")
+
+        for i = fold_range.start, fold_range.ending do
+          local line = vim.fn.getline(i)
+          if not (lsp_pattern and line:match(lsp_pattern)) then
+            if line:match(line_pattern) then
+              local new_line = line:gsub(line_pattern .. "%s?", "", 1)
+              vim.fn.setline(i, new_line)
+            end
+          end
+        end
+
+        vim.cmd(string.format("silent! %d,%d normal! ==", fold_range.start, fold_range.ending))
+        vim.defer_fn(function()
+          vim.fn.cursor(fold_range.start, 1)
+          pcall(function()
+            vim.cmd("normal! zc")
+          end)
+        end, 50)
+      end
+
+      -- Handle non-fold lines
+      for _, lnum in ipairs(non_fold_lines) do
         local line = vim.fn.getline(lnum)
-        if vim.trim(line) ~= "" then -- Skip empty lines
-          vim.fn.cursor(lnum, 1)
-          M.comment.comment_line()
+        if not (lsp_pattern and line:match(lsp_pattern)) then
+          if line:match(line_pattern) then
+            local new_line = line:gsub(line_pattern .. "%s?", "", 1)
+            vim.fn.setline(lnum, new_line)
+          end
         end
       end
     end
@@ -439,6 +540,7 @@ end
 -- =============================================================================
 -- Case Conversion / 变量名大小写转换
 -- =============================================================================
+
 -- Define keywords to ignore per filetype
 -- 针对不同文件类型定义需要忽略的关键字 (不参与大小写转换)
 local IGNORE_KEYWORDS = {
@@ -612,10 +714,7 @@ IGNORE_KEYWORDS.ts = IGNORE_KEYWORDS.typescript
 IGNORE_KEYWORDS.js = IGNORE_KEYWORDS.javascript
 IGNORE_KEYWORDS.rs = IGNORE_KEYWORDS.rust
 
--- =============================================================================
 -- Utility Functions / 工具函数
--- =============================================================================
-
 local function capitalize(word)
   return word:sub(1, 1):upper() .. word:sub(2):lower()
 end
@@ -624,7 +723,6 @@ local function lowercase(word)
   return word:lower()
 end
 
--- Check if a word is in the ignore list for the current buffer's filetype
 -- 检查单词是否在当前文件类型的忽略列表中
 local function is_keyword(word, ft)
   local list = IGNORE_KEYWORDS[ft]
@@ -639,7 +737,6 @@ local function is_keyword(word, ft)
   return false
 end
 
--- Existing Tokenizer (kept as is)
 -- 现有的分词逻辑 (保留原样)
 local function tokenize(text)
   local words = {}
@@ -760,10 +857,7 @@ local function process_identifier(text)
   return convert_to_case(words, new_case)
 end
 
--- =============================================================================
 -- Main Logic / 主逻辑
--- =============================================================================
-
 M.cycle_case = function()
   -- Get current mode
   local mode = vim.fn.mode()
@@ -884,5 +978,4 @@ M.cycle_case = function()
   end)
 end
 
--- local a-bob-34-b = 1
 return M

@@ -48,7 +48,7 @@ local opts = {
   lazygit = { enabled = false },
   terminal = { enabled = true },
   gitbrowse = { enabled = true },
-  dashboard = { enabled = true },
+  -- dashboard = { enabled = true },
 }
 
 require("snacks").setup(opts)

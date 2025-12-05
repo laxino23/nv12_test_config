@@ -1,4 +1,3 @@
--- 1. 插件安装
 vim.pack.add({
   { src = "https://github.com/folke/persistence.nvim", name = "persistence.nvim" },
   { src = "https://github.com/folke/ts-comments.nvim", name = "ts-comments.nvim" },
@@ -12,29 +11,148 @@ vim.pack.add({
   { src = "https://github.com/sphamba/smear-cursor.nvim", name = "smear-cursor.nvim" },
 })
 
--- 定义懒加载组，防止重复触发
 local lazy_group = vim.api.nvim_create_augroup("ConfigLazyLoad", { clear = true })
 
--- 2. 核心功能 (Session) - 稍微延迟加载以不阻塞 UI
-vim.defer_fn(function()
-  local persistence = require("persistence")
-  persistence.setup({
-    dir = vim.fn.stdpath("state") .. "/sessions/",
-    need = 0,
-    branch = true,
-  })
-  -- 快捷键定义 (这些本身就是懒加载，因为只有按下才会执行 function)
-  vim.keymap.set("n", "<leader>qs", function()
-    persistence.load()
-  end, { desc = "Restore Session" })
-  vim.keymap.set("n", "<leader>ql", function()
-    persistence.load({ last = true })
-  end, { desc = "Restore Last Session" })
-  vim.keymap.set("n", "<leader>qd", function()
-    persistence.stop()
-  end, { desc = "Don't Save Current Session" })
-end, 100) -- 延迟 100ms
+-- ============================================================================
+-- Persistence setup and auto recover the session
+-- ============================================================================
+local map = require("config.keymaps.utils").map
+local persistence = require("persistence")
 
+-- Configure sessionoptions to include folds and cursor position
+vim.opt.sessionoptions = {
+  "buffers", -- Save all buffers
+  "curdir", -- Save current directory
+  "tabpages", -- Save tabs
+  "winsize", -- Save window sizes
+  "help", -- Save help windows
+  "globals", -- Save global variables
+  "skiprtp", -- Don't save runtime path
+  "folds", -- ✅ Save fold states
+  "blank", -- Save empty windows
+  "terminal", -- Save terminal buffers
+}
+
+-- Ensure folds are properly saved with these settings
+vim.opt.viewoptions = {
+  "folds", -- Save folds
+  "cursor", -- ✅ Save cursor position
+  "curdir", -- Save current directory
+  "options", -- Save options
+}
+
+persistence.setup({
+  dir = vim.fn.stdpath("state") .. "/sessions/",
+  need = 0,
+  branch = true,
+})
+
+map({ -- 普通保存（不变）
+  ["save"] = { "n", "<leader>ww", ":w<CR>" },
+
+  -- 保存文件 + 保存会话 + 退出
+  ["save-and-quit"] = {
+    "n",
+    "<leader>wq",
+    function()
+      vim.cmd("w") -- 保存当前文件
+      vim.cmd("wshada!") -- ✅ 强制保存 ShaDa（包含光标位置等）
+      persistence.save() -- 保存会话
+      vim.cmd("qa!") -- 退出所有窗口
+    end,
+  },
+
+  -- 仅退出，不保存会话（临时离开或实验时用）
+  ["quit-without-session"] = {
+    "n",
+    "<leader>wa",
+    function()
+      persistence.stop() -- 阻止本次退出时保存会话
+      vim.cmd("qa!") -- 退出所有
+    end,
+  },
+  ["quit-special-buf"] = {
+    "n",
+    "<leader>we",
+    function()
+      vim.cmd("q")
+    end,
+  },
+  -- 强制退出（连当前文件都不保存，也不保存会话）
+  ["force-quit"] = {
+    "n",
+    "<leader>wx",
+    function()
+      persistence.stop()
+      vim.cmd("qa!")
+    end,
+  },
+
+  -- 只保存当前会话（不退出，手动触发时很有用）
+  ["session-save"] = {
+    "n",
+    "<leader>qs",
+    function()
+      vim.cmd("wshada!") -- ✅ 保存 ShaDa
+      persistence.save()
+    end,
+    "手动保存当前会话",
+  },
+
+  -- 恢复当前目录的会话
+  ["session-load"] = {
+    "n",
+    "<leader>ql",
+    function()
+      persistence.load()
+      vim.cmd("rshada!") -- ✅ 重新加载 ShaDa
+    end,
+    "恢复当前项目会话",
+  },
+
+  -- 恢复上一次全局会话（跨项目）
+  ["session-load-last"] = {
+    "n",
+    "<leader>qL",
+    function()
+      persistence.load({ last = true })
+      vim.cmd("rshada!") -- ✅ 重新加载 ShaDa
+    end,
+    "恢复最后一次会话",
+  },
+
+  -- 取消本次会话自动保存（临时配置时用）
+  ["session-stop"] = {
+    "n",
+    "<leader>qd",
+    persistence.stop,
+    "本次退出不保存会话",
+  },
+}, { silent = true })
+
+-- Auto-load last session on startup (if no files opened)
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    -- Only auto-load if no arguments and it's an empty buffer
+    if vim.fn.argc() == 0 then
+      local buf_name = vim.api.nvim_buf_get_name(0)
+      local buf_lines = vim.api.nvim_buf_line_count(0)
+
+      -- Check if it's truly an empty buffer
+      if buf_name == "" and buf_lines == 1 then
+        local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
+        if first_line == "" then
+          vim.schedule(function()
+            persistence.load({ last = true })
+            vim.cmd("rshada!")
+            print("✓ Auto-loaded last session")
+          end)
+        end
+      end
+    end
+  end,
+  nested = true,
+})
 -- 3. 编辑模式懒加载 (InsertEnter)
 vim.api.nvim_create_autocmd("InsertEnter", {
   group = lazy_group,
@@ -168,3 +286,8 @@ vim.api.nvim_create_user_command("ScreenkeyToggle", function()
 end, {})
 
 vim.keymap.set("n", "<leader>uk", ":ScreenkeyToggle<CR>", { desc = "Screenkey Toggle" })
+
+-- 123
+-- 123
+-- 123
+-- 123

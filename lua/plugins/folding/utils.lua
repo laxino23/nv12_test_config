@@ -84,8 +84,7 @@ end
 
 -- 3. Cleaning Logic
 
--- Strip prefix signs (for Comment Blocks)
--- 剥离前缀符号（用于注释块）
+-- Strip prefix signs (for Block-Style Comments ONLY)
 local function remove_start_comment_sign(text, filetype)
   local trimmed = vim.trim(text)
   if filetype == "lua" then
@@ -106,14 +105,15 @@ local function remove_start_comment_sign(text, filetype)
   return trimmed
 end
 
--- [NEW] Process First Line Chunks
--- Handles stripping trailing comments for code, or stripping prefixes for comment blocks.
--- [新] 处理第一行块。处理代码的尾随注释剥离，或注释块的前缀剥离。
-local function process_first_line(virtText, filetype, is_comment)
+-- Process First Line Chunks
+-- Handles stripping trailing comments for code, or stripping prefixes for TRUE block comments only.
+local function process_first_line(virtText, filetype, is_comment, is_block_style)
   local cleaned_chunks = {}
 
-  if is_comment then
-    -- Case A: Comment Block (e.g., --[[ text ]])
+  -- Only strip comment prefix if it's a BLOCK-STYLE comment (e.g., --[[ ]], /* */)
+  -- For single-line comment blocks (e.g., multiple -- lines), keep the prefix intact
+  if is_comment and is_block_style then
+    -- Case A: Block-Style Comment (e.g., --[[ text ]] or /* text */)
     -- Remove the comment opener from the first chunk, keep the text
     local found_prefix = false
     for _, chunk in ipairs(virtText) do
@@ -130,7 +130,7 @@ local function process_first_line(virtText, filetype, is_comment)
         table.insert(cleaned_chunks, { text, hl })
       end
     end
-  else
+  elseif not is_comment then
     -- Case B: Code Block (e.g., local x = 1 -- comment)
     -- Stop adding chunks as soon as we hit a comment (trailing comment removal)
     for _, chunk in ipairs(virtText) do
@@ -141,23 +141,42 @@ local function process_first_line(virtText, filetype, is_comment)
       end
       table.insert(cleaned_chunks, chunk)
     end
+  else
+    -- Case C: Single-line comment block (e.g., multiple -- lines)
+    -- Keep everything as-is, including the comment prefix
+    for _, chunk in ipairs(virtText) do
+      table.insert(cleaned_chunks, chunk)
+    end
   end
 
   return cleaned_chunks
 end
 
 -- Clean Last Line by Regex
--- 使用正则清理最后一行
-local function clean_last_line_by_regex(text, filetype, is_block_style)
-  if is_block_style then
-    -- Inside block comment: Remove prefix (--) but keep suffix (]])
-    if filetype == "lua" then
+local function clean_last_line_by_regex(text, filetype, is_block_style, is_comment)
+  if is_comment then
+    -- For any comment block (block-style OR single-line), remove the comment prefix
+    if filetype == "lua" or filetype == "sql" then
       return text:gsub("^%s*%-%-+%s*", "")
+    elseif filetype == "python" or filetype == "sh" or filetype == "bash" or filetype == "ruby" then
+      return text:gsub("^%s*#+%s*", "")
+    elseif
+      filetype == "javascript"
+      or filetype == "typescript"
+      or filetype == "c"
+      or filetype == "cpp"
+      or filetype == "rust"
+      or filetype == "go"
+      or filetype == "java"
+    then
+      return text:gsub("^%s*//+%s*", ""):gsub("^%s*/%*+%s*", "")
+    elseif filetype == "vim" then
+      return text:gsub('^%s*"+%s*', "")
     elseif filetype == "html" or filetype == "xml" or filetype == "markdown" then
-      return text
+      return text:gsub("^%s*<!%-%-+%s*", "")
     end
   else
-    -- Code block: Remove trailing comment completely
+    -- For code blocks, remove trailing comments
     if filetype == "lua" or filetype == "sql" then
       return text:gsub("%s*%-%-.*$", "")
     elseif filetype == "python" or filetype == "sh" or filetype == "bash" or filetype == "ruby" then
@@ -177,17 +196,17 @@ local function clean_last_line_by_regex(text, filetype, is_block_style)
   return text
 end
 
-local function get_last_line_virt_text(ctx, endLnum, filetype, is_block_style)
+local function get_last_line_virt_text(ctx, endLnum, filetype, is_block_style, is_comment)
   local last_line = vim.api.nvim_buf_get_lines(ctx.bufnr, endLnum - 1, endLnum, false)[1]
   if not last_line or last_line == "" then
     return {}
   end
 
-  local cleaned_text = clean_last_line_by_regex(last_line, filetype, is_block_style)
+  local cleaned_text = clean_last_line_by_regex(last_line, filetype, is_block_style, is_comment)
   cleaned_text = vim.trim(cleaned_text)
 
   if cleaned_text ~= "" then
-    local hl = is_block_style and "Comment" or "Normal"
+    local hl = is_comment and "Comment" or "Normal"
     return { { cleaned_text, hl } }
   end
   return {}
@@ -205,7 +224,7 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
   local is_comment, is_block_style = is_comment_block(ctx.bufnr, lnum, endLnum, filetype)
 
   -- 1. Handle First Line (with trailing removal or prefix stripping)
-  local first_line_chunks = process_first_line(virtText, filetype, is_comment)
+  local first_line_chunks = process_first_line(virtText, filetype, is_comment, is_block_style)
 
   -- Render First Line
   local targetWidth = width - sufWidth
@@ -231,7 +250,8 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
 
   -- 3. Handle Last Line
   if fold_lines > 0 then
-    local last_line_chunks = get_last_line_virt_text(ctx, endLnum, filetype, is_block_style)
+    local last_line_chunks =
+      get_last_line_virt_text(ctx, endLnum, filetype, is_block_style, is_comment)
     if last_line_chunks and #last_line_chunks > 0 then
       local used_width = curWidth + sepWidth + sufWidth
       local remaining_space = width - used_width
@@ -261,4 +281,13 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
   return newVirtText
 end
 
+M.helper_function = {
+  is_comment_block = is_comment_block,
+  is_comment_line = is_comment_line,
+}
+M.comment_type = {
+  lsp_annotation_patterns = lsp_annotation_patterns,
+  filetype_comment_patterns = filetype_comment_patterns,
+  filetype_block_comment_patterns = filetype_block_comment_patterns,
+}
 return M

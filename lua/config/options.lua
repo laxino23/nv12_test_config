@@ -1,7 +1,6 @@
 local o = vim.opt
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
-vim.deprecate = function() end
 -- =============================================================================
 --  1. UI & Visuals (界面与视觉)
 -- =============================================================================
@@ -89,8 +88,8 @@ if vim.g.neovide then
   vim.g.neovide_hide_mouse_when_typing = false
 
   -- 4. 粒子特效 (如果在 TOML 没生效，可以在这里强制开启)
-  vim.g.neovide_cursor_vfx_mode = "ripple"
-  vim.g.neovide_cursor_trail_size = 1.0
+  -- vim.g.neovide_cursor_vfx_mode = "ripple"
+  -- vim.g.neovide_cursor_trail_size = 1.0
 
   -- 5. 确保这一项开启，否则透明背景可能看起来很奇怪
   vim.opt.termguicolors = true
