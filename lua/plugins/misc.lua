@@ -16,7 +16,7 @@ local lazy_group = vim.api.nvim_create_augroup("ConfigLazyLoad", { clear = true 
 -- ============================================================================
 -- Persistence setup and auto recover the session
 -- ============================================================================
-local map = require("config.keymaps.utils").map
+local map = require("config.keymaps").map
 local persistence = require("persistence")
 
 -- Configure sessionoptions to include folds and cursor position

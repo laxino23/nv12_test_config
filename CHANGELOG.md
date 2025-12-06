@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - Fix the weird changelod ([8560682](856068275c835482f117dfb5b9e5cbf85b5e0fe1))
 - Git issues ([b4dfaa4](b4dfaa42ed5ca0cc6001a4da2c6df7a3620e3a2d))
 - Testing ([7995525](7995525fc23226ebe9713f909ca71876efdb6927))
-- Nothing ([7f8349e](7f8349e584ac29a47fa5b36d5e6444f891eb5c4e))
+- Nothing ([44e5b03](44e5b034a3d98ddf55ab2b2c02ce2ea4fea5e1f7))
 
 ### 🐛 Bug Fixes
 
@@ -32,3 +32,4 @@ All notable changes to this project will be documented in this file.
 ### 🚀 Features
 
 - *(comment a fold)* Now can comment a fold in n and v without open it ([fbee652](fbee6520ffdcdc5098780792f4a90b51620d1e31))
+- *(line movement)* Add left and right selection movement horizontally ([5a0a4dd](5a0a4ddc251043af01c5670090475dca0e8d48c5))

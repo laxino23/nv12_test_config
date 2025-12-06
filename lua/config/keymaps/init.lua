@@ -1,5 +1,3 @@
-require("config.keymaps.keymaps")
-
 local M = {}
 
 -- =============================================================================
@@ -10,7 +8,6 @@ local M = {}
 ---批量注册配置表中的按键映射。
 ---@param config table<string, table>
 ---@param opts table|nil
----@return nil
 M.map = function(config, opts)
   opts = opts or {}
 
@@ -32,5 +29,18 @@ M.map = function(config, opts)
     vim.keymap.set(mode, lhs, rhs, final_opts)
   end
 end
+
+-- =============================================================================
+-- Load Modules / 加载模块
+-- =============================================================================
+-- Inject the map function into sub-modules
+-- 将 map 函数注入子模块
+
+require("config.keymaps.movement")(M.map)
+require("config.keymaps.comment")(M.map)
+require("config.keymaps.text_case")(M.map)
+require("config.keymaps.editor")(M.map)
+require("config.keymaps.navigation")(M.map)
+require("config.keymaps.terminal")(M.map)
 
 return M
