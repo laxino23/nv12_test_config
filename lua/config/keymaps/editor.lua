@@ -74,6 +74,7 @@ return function(map)
     ["redo"] = { { "n", "i", "v", "t", "c" }, "<C-r>", M.redo },
     ["paste-without-yank"] = { "x", "p", '"_dP' },
     ["delete-without-yank"] = { { "n", "v" }, "d", '"_d' },
+    ["cut"] = { { "n", "v" }, "D", "d" },
     ["indent-left"] = { "v", "<", "<gv" },
     ["indent-right"] = { "v", ">", ">gv" },
     ["insert-above-three-lines"] = {

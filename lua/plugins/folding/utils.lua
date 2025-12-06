@@ -110,18 +110,26 @@ end
 local function process_first_line(virtText, filetype, is_comment, is_block_style)
   local cleaned_chunks = {}
 
-  -- Only strip comment prefix if it's a BLOCK-STYLE comment (e.g., --[[ ]], /* */)
-  -- For single-line comment blocks (e.g., multiple -- lines), keep the prefix intact
+  -- Helper to check if a highlight group is a comment
+  local function is_comment_hl(hl)
+    if type(hl) ~= "string" then
+      return false
+    end
+    local hl_lower = hl:lower()
+    -- Match various comment highlight patterns
+    return hl_lower:match("comment")
+      or hl_lower:match("^@comment")
+      or hl_lower:match("^@lsp%.type%.comment")
+  end
+
   if is_comment and is_block_style then
     -- Case A: Block-Style Comment (e.g., --[[ text ]] or /* text */)
-    -- Remove the comment opener from the first chunk, keep the text
     local found_prefix = false
     for _, chunk in ipairs(virtText) do
       local text = chunk[1]
       local hl = chunk[2]
 
-      -- Only clean the first comment chunk we find
-      if not found_prefix and type(hl) == "string" and hl:lower():match("comment") then
+      if not found_prefix and is_comment_hl(hl) then
         text = remove_start_comment_sign(text, filetype)
         found_prefix = true
       end
@@ -132,18 +140,25 @@ local function process_first_line(virtText, filetype, is_comment, is_block_style
     end
   elseif not is_comment then
     -- Case B: Code Block (e.g., local x = 1 -- comment)
-    -- Stop adding chunks as soon as we hit a comment (trailing comment removal)
     for _, chunk in ipairs(virtText) do
+      local text = chunk[1]
       local hl = chunk[2]
-      -- If we hit a comment chunk in a code block, it's a trailing comment -> Skip it and everything after
-      if type(hl) == "string" and hl:lower():match("comment") then
+
+      -- If we hit a comment chunk, stop (trailing comment removal)
+      if is_comment_hl(hl) then
         break
       end
+
+      -- Also check if the text itself starts with a comment marker as fallback
+      local comment_pattern = filetype_comment_patterns[filetype]
+      if comment_pattern and text:match(comment_pattern) then
+        break
+      end
+
       table.insert(cleaned_chunks, chunk)
     end
   else
-    -- Case C: Single-line comment block (e.g., multiple -- lines)
-    -- Keep everything as-is, including the comment prefix
+    -- Case C: Single-line comment block
     for _, chunk in ipairs(virtText) do
       table.insert(cleaned_chunks, chunk)
     end
@@ -151,7 +166,6 @@ local function process_first_line(virtText, filetype, is_comment, is_block_style
 
   return cleaned_chunks
 end
-
 -- Clean Last Line by Regex
 local function clean_last_line_by_regex(text, filetype, is_block_style, is_comment)
   if is_comment then
@@ -258,15 +272,15 @@ M.handler = function(virtText, lnum, endLnum, width, truncate, ctx)
       if remaining_space > 2 then
         for _, chunk in ipairs(last_line_chunks) do
           local text = chunk[1]
-          local hl = chunk[2]
+          -- local hl = chunk[2]
           local text_width = vim.fn.strdisplaywidth(text)
           if text_width <= remaining_space then
-            table.insert(newVirtText, { text, hl })
+            table.insert(newVirtText, { text, "Folded" })
             remaining_space = remaining_space - text_width
           else
             text = truncate(text, remaining_space)
             if text ~= "" then
-              table.insert(newVirtText, { text, hl })
+              table.insert(newVirtText, { text, "Folded" })
             end
             break
           end

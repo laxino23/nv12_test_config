@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 - *(mis add)* Deleted the mis-add file ([79207e2](79207e22b4b21edfad023633b33309a10395f3d6))
 - *(fix)* Fix the trailing comments for the fold ([dd34df2](dd34df2606ff2b47bc53c2edfd66e19dfda9b18d))
 - Minor change ([9a38a84](9a38a84c65534cee64bcb31e0fa63364bb334630))
-- Fix the bug i forgot to add the editor keymaps lol ([717b140](717b140d1fc76c7d0f28f7d69394375070bfc894))
+- Fix the bug i forgot to add the editor keymaps lol ([c6f3a4e](c6f3a4e20cb0c3df8ca9d67fd62621ea658f4af7))
 
 ### 📚 Documentation
 
@@ -39,3 +39,4 @@ All notable changes to this project will be documented in this file.
 
 - Refac the keymap dir ([b137853](b137853435fdd84e66981e160b840d21a05d1f32))
 - Refac the keymap folder ([5aa5bb1](5aa5bb1e682746964082048352a40c9c57b28090))
+- Rearrange the code structure ([5d5fff7](5d5fff7fc0fbb9ebf1ea30d7df2a08d88534f266))

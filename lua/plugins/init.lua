@@ -8,16 +8,14 @@ end
 use({
   "treesitter",
   "themes",
-  "conform",
   "blink",
+  "extras",
   "lsp",
-  "mini",
-  "misc",
   "snacks",
   "indent",
   "heirline",
   "overseer",
   "noice",
-  "multicursor",
   "folding",
+  "todos",
 })

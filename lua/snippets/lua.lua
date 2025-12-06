@@ -226,11 +226,10 @@ ls.add_snippets("lua", {
     },
     fmt(
       [[
-  {{ src = "https://github.com/{repo}"{opts} }}
+  {{ src = "https://github.com/{repo}" }},
   ]],
       {
         repo = i(1, "user/plugin"),
-        opts = i(2, ", version = 'main'"),
       }
     )
   ),

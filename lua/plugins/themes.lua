@@ -2,55 +2,13 @@ vim.pack.add({
   { src = "https://github.com/catppuccin/nvim" },
   { src = "https://github.com/maxmx03/fluoromachine.nvim" },
   { src = "https://github.com/ribru17/bamboo.nvim" },
+  { src = "https://github.com/uga-rosa/ccc.nvim" },
 })
-
--- fluoromachine setup
-local fm = require("fluoromachine")
-fm.setup({
-  glow = true,
-  theme = "fluoromachine",
-  transparent = false,
-  brightness = 0.05,
-})
-
--- catppuccin setup
-require("catppuccin").setup({
-  transparent_background = true,
-  term_colors = true,
-  integrations = {
-    aerial = true,
-    diffview = true,
-    mini = {
-      enabled = true,
-      indentscope_color = "sky",
-    },
-    noice = true,
-    overseer = true,
-    telescope = {
-      enabled = true,
-      style = "nvchad",
-    },
-    treesitter = true,
-    gitsigns = true,
-    flash = true,
-    blink_cmp = true,
-    mason = true,
-    snacks = true,
-  },
-  highlight_overrides = {
-    mocha = function(mocha)
-      return {
-        CursorLineNr = { fg = mocha.yellow },
-        FlashCurrent = { bg = mocha.peach, fg = mocha.base },
-        FlashMatch = { bg = mocha.red, fg = mocha.base },
-        FlashLabel = { bg = mocha.teal, fg = mocha.base },
-        NormalFloat = { bg = mocha.base },
-        FloatBorder = { bg = mocha.base },
-        FloatTitle = { bg = mocha.base },
-        RenderMarkdownCode = { bg = mocha.crust },
-        Pmenu = { bg = mocha.base },
-      }
-    end,
+-- ccc setup
+require("ccc").setup({
+  highlighter = {
+    auto_enable = true,
+    lsp = true,
   },
 })
 
@@ -130,14 +88,90 @@ local opts = {
 }
 require("bamboo").setup(opts)
 
-vim.api.nvim_create_autocmd("BufEnter", {
+-- fluoromachine setup
+require("fluoromachine").setup({
+  glow = true,
+  theme = "fluoromachine",
+  transparent = false,
+  brightness = 0.05,
+})
+
+-- catppuccin setup
+require("catppuccin").setup({
+  transparent_background = true,
+  term_colors = true,
+  integrations = {
+    aerial = true,
+    diffview = true,
+    mini = {
+      enabled = true,
+      indentscope_color = "sky",
+    },
+    noice = true,
+    overseer = true,
+    telescope = {
+      enabled = true,
+      style = "nvchad",
+    },
+    treesitter = true,
+    gitsigns = true,
+    flash = true,
+    blink_cmp = true,
+    mason = true,
+    snacks = true,
+  },
+  highlight_overrides = {
+    mocha = function(mocha)
+      return {
+        CursorLineNr = { fg = mocha.yellow },
+        FlashCurrent = { bg = mocha.peach, fg = mocha.base },
+        FlashMatch = { bg = mocha.red, fg = mocha.base },
+        FlashLabel = { bg = mocha.teal, fg = mocha.base },
+        NormalFloat = { bg = mocha.base },
+        FloatBorder = { bg = mocha.base },
+        FloatTitle = { bg = mocha.base },
+        RenderMarkdownCode = { bg = mocha.crust },
+        Pmenu = { bg = mocha.base },
+      }
+    end,
+  },
+})
+
+local function set_transparent_guides()
+  local pmenu_bg = vim.api.nvim_get_hl(0, { name = "Pmenu" }).bg
+  local bg_color = pmenu_bg and string.format("#%06x", pmenu_bg) or "#2c3248"
+  local ul_color = "#ffff00"
+
+  vim.api.nvim_set_hl(0, "Folded", { bg = "#2c3248", fg = "NONE", italic = true, bold = false })
+
+  -- Darker semi-transparent CursorLine
+  vim.api.nvim_set_hl(0, "CursorLine", {
+    bg = bg_color or "#1a1b26", -- Darker background color
+    blend = 20, -- 0 = opaque, 100 = fully transparent (try 10-30 for subtle effect)
+    underdouble = true,
+    bold = false,
+    sp = ul_color,
+  })
+
+  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#ff9e64", bold = false })
+  vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#1f1f1f", fg = "NONE" })
+  vim.cmd.hi("Comment gui=none")
+  vim.cmd.hi("statusline guibg=NONE")
+end
+
+-- Load colorscheme on buffer enter
+vim.api.nvim_create_autocmd({ "BufEnter", "BufCreate" }, {
   pattern = "*",
   callback = function()
-    -- vim.cmd("colorscheme catppuccin")
     vim.cmd("colorscheme bamboo")
-    -- vim.cmd("colorscheme fluoromachine")
+    set_transparent_guides()
   end,
 })
 
-vim.cmd.hi("statusline guibg=NONE")
-vim.cmd.hi("Comment gui=none")
+-- Reapply highlights when colorscheme changes
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
+  callback = function()
+    set_transparent_guides()
+  end,
+})

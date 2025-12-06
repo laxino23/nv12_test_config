@@ -1,24 +1,4 @@
 -- =============================================================================
--- guide lines for cursorline
--- =============================================================================
-local function set_transparent_guides()
-  local pmenu_bg = vim.api.nvim_get_hl(0, { name = "Pmenu" }).bg
-  local bg_color = pmenu_bg and string.format("#%06x", pmenu_bg) or "#2c3248"
-  local ul_color = "#ffff00"
-  vim.api.nvim_set_hl(
-    0,
-    "CursorLine",
-    { bg = bg_color, underdouble = true, bold = false, sp = ul_color }
-  )
-  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#ff9e64", bold = false })
-  vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#1f1f1f", fg = "NONE" })
-end
-set_transparent_guides()
-vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = set_transparent_guides,
-})
-
--- =============================================================================
 -- Set scrolloff to 25% of window height
 -- =============================================================================
 vim.api.nvim_create_autocmd({ "VimResized", "WinResized" }, {
@@ -84,7 +64,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       -- Use silent! to avoid errors if the file has no saved view yet
       vim.defer_fn(function()
         vim.cmd("silent! loadview")
-      end, 100)
+      end, 200)
     end
   end,
 })

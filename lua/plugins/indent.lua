@@ -54,7 +54,7 @@ local function init_blink_indent()
       },
     },
     scope = {
-      enabled = false,
+      enabled = true,
       char = "║",
       priority = 1000,
       highlights = {
@@ -152,7 +152,7 @@ M.scope = {
   },
 }
 M.chunk = {
-  enabled = true,
+  enabled = false,
   char = {
     corner_top = "╭",
     corner_bottom = "╰",
