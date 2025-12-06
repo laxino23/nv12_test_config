@@ -9,6 +9,7 @@ local map = utils.map
 -- ============================================================================
 -- Basic Operations / 基础操作
 -- ============================================================================
+
 -- local persistence = require("persistence")
 -- map({
 -- -- 普通保存（不变）
@@ -76,28 +77,58 @@ map({
     "x",
     "<M-j>",
     function()
-      lineMovement.move_visual_selection("down")
+      lineMovement.move_visual_line_v("down")
     end,
   },
   ["move-selection-up"] = {
     "x",
     "<M-k>",
     function()
-      lineMovement.move_visual_selection("up")
+      lineMovement.move_visual_line_v("up")
     end,
   },
   ["move-line-down"] = {
     "n",
     "<M-j>",
     function()
-      lineMovement.move_normal_selection("down")
+      lineMovement.move_normal_line_v("down")
     end,
   },
   ["move-line-up"] = {
     "n",
     "<M-k>",
     function()
-      lineMovement.move_normal_selection("up")
+      lineMovement.move_normal_line_v("up")
+    end,
+  },
+}, { silent = true })
+map({
+  ["move-selection-left"] = {
+    "x",
+    "<M-h>",
+    function()
+      lineMovement.move_visual_word_h("left")
+    end,
+  },
+  ["move-selection-right"] = {
+    "x",
+    "<M-l>",
+    function()
+      lineMovement.move_visual_word_h("right")
+    end,
+  },
+  ["move-word-left"] = {
+    "n",
+    "<M-h>",
+    function()
+      lineMovement.move_normal_word_h("left")
+    end,
+  },
+  ["move-word-right"] = {
+    "n",
+    "<M-l>",
+    function()
+      lineMovement.move_normal_word_h("right")
     end,
   },
 }, { silent = true })

@@ -104,4 +104,7 @@ if vim.g.neovide then
   -- 7. trasparent
   vim.g.neovide_opacity = 0.5
   vim.g.neovide_normal_opacity = 0.5
+
+  -- 8. enable opts to meta
+  vim.g.neovide_input_macos_option_key_is_meta = "both"
 end

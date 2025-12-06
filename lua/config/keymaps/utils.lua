@@ -47,9 +47,7 @@ local function get_visual_unit(line_num)
   end
 end
 
--- Move lines in Normal mode (Fold aware)
--- 普通模式下移动行（感知折叠）
-M.lineMovement.move_normal_selection = function(direction)
+M.lineMovement.move_normal_line_v = function(direction)
   local cur = vim.fn.line(".")
   local start_line, end_line
   local fold_start = vim.fn.foldclosed(cur)
@@ -93,9 +91,7 @@ M.lineMovement.move_normal_selection = function(direction)
     vim.fn.cursor(cur - adjust, vim.fn.col("."))
   end
 end
--- Move selection in Visual mode
--- 可视模式下移动选区
-M.lineMovement.move_visual_selection = function(direction)
+M.lineMovement.move_visual_line_v = function(direction)
   vim.cmd("normal! \27") -- Exit visual mode to get marks
   local s_start = vim.fn.line("'<")
   local s_end = vim.fn.line("'>")
@@ -133,6 +129,91 @@ M.lineMovement.move_visual_selection = function(direction)
   if new_end > new_start then
     vim.cmd("normal! " .. new_end .. "G")
   end
+end
+
+M.lineMovement.move_visual_word_h = function(direction)
+  -- Exit visual mode to capture marks
+  vim.cmd("normal! \27")
+
+  local start_pos = vim.fn.getpos("'<")
+  local end_pos = vim.fn.getpos("'>")
+  local start_line = start_pos[2]
+  local start_col = start_pos[3]
+  local end_col = end_pos[3]
+
+  -- Only support single-line horizontal movement
+  if start_line ~= end_pos[2] then
+    vim.cmd("normal! gv")
+    return
+  end
+
+  local line = vim.fn.getline(start_line)
+  local line_len = #line
+
+  if direction == "left" then
+    -- Can't move if at start of line
+    if start_col <= 1 then
+      vim.cmd("normal! gv")
+      return
+    end
+
+    -- Get selected text
+    local selected_text = line:sub(start_col, end_col)
+
+    -- Get char before selection
+    local char_before = line:sub(start_col - 1, start_col - 1)
+
+    -- Build new line: before selection (minus 1 char) + char_before + selected_text + after selection
+    local before = line:sub(1, start_col - 2)
+    local after = line:sub(end_col + 1)
+    local new_line = before .. selected_text .. char_before .. after
+
+    -- Set the new line
+    vim.fn.setline(start_line, new_line)
+
+    -- Reselect at new position
+    local new_start_col = start_col - 1
+    local new_end_col = end_col - 1
+
+    vim.fn.setpos("'<", { 0, start_line, new_start_col, 0 })
+    vim.fn.setpos("'>", { 0, start_line, new_end_col, 0 })
+    vim.cmd("normal! gv")
+  elseif direction == "right" then
+    -- Can't move if at end of line
+    if end_col >= line_len then
+      vim.cmd("normal! gv")
+      return
+    end
+
+    -- Get selected text
+    local selected_text = line:sub(start_col, end_col)
+
+    -- Get char after selection
+    local char_after = line:sub(end_col + 1, end_col + 1)
+
+    -- Build new line: before + char_after + selected_text + after selection
+    local before = line:sub(1, start_col - 1)
+    local after = line:sub(end_col + 2)
+    local new_line = before .. char_after .. selected_text .. after
+
+    -- Set the new line
+    vim.fn.setline(start_line, new_line)
+
+    -- Reselect at new position
+    local new_start_col = start_col + 1
+    local new_end_col = end_col + 1
+
+    vim.fn.setpos("'<", { 0, start_line, new_start_col, 0 })
+    vim.fn.setpos("'>", { 0, start_line, new_end_col, 0 })
+    vim.cmd("normal! gv")
+  end
+end
+M.lineMovement.move_normal_word_h = function(direction)
+  -- Select word under cursor (inner word)
+  vim.cmd("normal! viw")
+
+  -- Now move the selection
+  M.lineMovement.move_visual_word_h(direction)
 end
 
 -- =============================================================================
