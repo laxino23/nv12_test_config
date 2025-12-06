@@ -1,10 +1,11 @@
 vim.pack.add({
   { src = "https://github.com/catppuccin/nvim" },
   { src = "https://github.com/maxmx03/fluoromachine.nvim" },
+  { src = "https://github.com/ribru17/bamboo.nvim" },
 })
 
+-- fluoromachine setup
 local fm = require("fluoromachine")
-
 fm.setup({
   glow = true,
   theme = "fluoromachine",
@@ -12,6 +13,7 @@ fm.setup({
   brightness = 0.05,
 })
 
+-- catppuccin setup
 require("catppuccin").setup({
   transparent_background = true,
   term_colors = true,
@@ -51,7 +53,91 @@ require("catppuccin").setup({
     end,
   },
 })
-vim.cmd("colorscheme catppuccin")
--- vim.cmd.colorscheme("fluoromachine")
+
+-- bamboo setup
+local opts = {
+  style = "multiplex", -- Choose between 'vulgaris' (regular), 'multiplex' (greener), and 'light'
+  transparent = vim.g.transparent,
+  lualine = {
+    transparent = true, -- lualine center bar transparency
+  },
+  code_style = {
+    comments = { italic = true },
+    conditionals = { italic = true },
+    keywords = {},
+    functions = {},
+    namespaces = { italic = true },
+    parameters = { italic = true },
+    strings = {},
+    variables = {},
+  },
+  colors = {
+    bg0 = "#333333",
+    red = "#CB4251",
+    aqua = "#0fb9e0",
+    lime = "#2ed592",
+    green = "#2ed563",
+    orange = "#F37A2E",
+    yellow = "#EADD61", --"#f0be42",
+    blue = "#38D0EF",
+    pink = "#f45ab4",
+    cyan = "#37c3b5",
+    purple = "#be9af7",
+  },
+  highlights = {
+    Comment = { fg = "#6D90A8", fmt = "italic" },
+    ["@comment"] = { link = "Comment" },
+    PmenuMatch = { bg = "#555555", fg = "#FFB870", fmt = "bold" },
+    PmenuMatchSel = { bold = true, sp = "bg0" },
+    FloatTitle = { fg = "$red", fmt = "bold" },
+    FloatBorder = { fg = "#3B38A0" },
+    Type = { fg = "$yellow", fmt = "bold" },
+    TablineFill = { fg = "$grey", bg = "bg0" },
+    MiniTablineFill = { fg = "$grey", bg = "bg0" },
+    MiniTablineHidden = { fg = "$fg", bg = "$bg1" },
+    ["@keyword.import"] = { fg = "#2ed592", fmt = "bold" },
+    ["@keyword.export"] = { fg = "#2ed592", fmt = "bold" },
+
+    ["@lsp.typemod.enum"] = { fg = "#61AEFF", fmt = "bold" },
+    ["@lsp.typemod.enumMember"] = { fg = "#9EC410", fmt = "bold" },
+    ["@lsp.typemod.enum.rust"] = { fg = "#61AEFF", fmt = "bold" },
+    ["@lsp.typemod.enumMember.rust"] = { fg = "#9EC410", fmt = "bold" },
+
+    ["@lsp.type.modifier"] = { link = "@keyword.modifier" },
+    ["@lsp.type.interface"] = { fg = "#D4A017", fmt = "bold,italic" },
+
+    BlinkCmpMenu = { bg = "$bg0" },
+    BlinkCmpDoc = { bg = "$bg0" },
+
+    SnacksPickerMatch = { link = "PmenuMatch" },
+
+    BlinkIndentRed = { link = "RainbowDelimiterRed" },
+    BlinkIndentOrange = { link = "RainbowDelimiterOrange" },
+    BlinkIndentYellow = { link = "RainbowDelimiterYellow" },
+    BlinkIndentGreen = { link = "RainbowDelimiterGreen" },
+    BlinkIndentCyan = { link = "RainbowDelimiterCyan" },
+    BlinkIndentBlue = { link = "RainbowDelimiterBlue" },
+    BlinkIndentViolet = { link = "RainbowDelimiterViolet" },
+
+    BlinkIndentRedUnderline = { link = "RainbowDelimiterRed" },
+    BlinkIndentOrangeUnderline = { link = "RainbowDelimiterOrange" },
+    BlinkIndentYellowUnderline = { link = "RainbowDelimiterYellow" },
+    BlinkIndentGreenUnderline = { link = "RainbowDelimiterGreen" },
+    BlinkIndentCyanUnderline = { link = "RainbowDelimiterCyan" },
+    BlinkIndentBlueUnderline = { link = "RainbowDelimiterBlue" },
+    BlinkIndentVioletUnderline = { link = "RainbowDelimiterViolet" },
+  },
+}
+require("bamboo").setup(opts)
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "*",
+  callback = function()
+    -- vim.cmd("colorscheme catppuccin")
+    vim.cmd("colorscheme bamboo")
+    -- vim.cmd("colorscheme fluoromachine")
+  end,
+})
+
 vim.cmd.hi("statusline guibg=NONE")
 vim.cmd.hi("Comment gui=none")

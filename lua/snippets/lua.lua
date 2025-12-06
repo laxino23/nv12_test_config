@@ -201,7 +201,7 @@ ls.add_snippets("lua", {
     {
       trig = "ghadd",
       name = "Add GitHub Plugin",
-      dscr = "添加单个 GitHub 插件，固定 https://github.com/ 前缀",
+      dscr = "添加 GitHub 插件，固定 https://github.com/ 前缀",
     },
     fmt(
       [[
@@ -218,7 +218,22 @@ ls.add_snippets("lua", {
       }
     )
   ),
-
+  s(
+    {
+      trig = "src",
+      name = "add a source from github",
+      dscr = "添加单个 GitHub src，固定 https://github.com/ 前缀",
+    },
+    fmt(
+      [[
+  {{ src = "https://github.com/{repo}"{opts} }}
+  ]],
+      {
+        repo = i(1, "user/plugin"),
+        opts = i(2, ", version = 'main'"),
+      }
+    )
+  ),
   -- 10. require 和 setup (trig: reqsetup)
   s(
     {
