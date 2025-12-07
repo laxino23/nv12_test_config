@@ -139,7 +139,7 @@ npairs.add_rules({
 })
 
 -- ============================================================================
--- Lazy Load Editing Tools
+-- Ts-autotags
 -- ============================================================================
 local lazy_group = vim.api.nvim_create_augroup("ConfigLazyEditing", { clear = true })
 
@@ -156,89 +156,124 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 -- ============================================================================
 -- Multicursor.nvim
 -- ============================================================================
-local status, mc = pcall(require, "multicursor-nvim")
-if status then
-  mc.setup()
+local mc = require("multicursor-nvim")
+mc.setup()
 
-  -- Keymaps
-  map({
-    -- Base Operations
-    ["multicursor-add-cursor"] = { { "n", "x" }, "mm", mc.addCursor },
-    ["multicursor-toggle"] = { { "n", "x" }, "<leader>up", mc.toggleCursor },
+-- Keymaps
+map({
+  -- Base Operations
+  ["multicursor-add-cursor"] = { { "n", "x" }, "mm", mc.addCursor },
+  ["multicursor-toggle"] = { { "n", "x" }, "<leader>up", mc.toggleCursor },
 
-    -- Line Operations (Add)
-    ["multicursor-add-up"] = {
-      { "n", "x" },
-      "<up>",
-      function()
+  -- Line Operations (Add)
+  ["multicursor-add-up"] = {
+    { "n", "x" },
+    "<up>",
+    function()
+      mc.lineAddCursor(-1)
+    end,
+  },
+  ["multicursor-add-down"] = {
+    { "n", "x" },
+    "<down>",
+    function()
+      mc.lineAddCursor(1)
+    end,
+  },
+
+  -- Line Operations (Skip)
+  ["multicursor-skip-up"] = {
+    { "n", "x" },
+    "<leader><up>",
+    function()
+      mc.lineSkipCursor(-1)
+    end,
+  },
+  ["multicursor-skip-down"] = {
+    { "n", "x" },
+    "<leader><down>",
+    function()
+      mc.lineSkipCursor(1)
+    end,
+  },
+
+  -- Match Operations
+  ["multicursor-match-next"] = {
+    { "n", "x" },
+    "<C-d>",
+    function()
+      mc.matchAddCursor(1)
+    end,
+  },
+  ["multicursor-match-prev"] = {
+    { "n", "x" },
+    "<C-u>",
+    function()
+      mc.matchAddCursor(-1)
+    end,
+  },
+
+  -- Mouse Operations
+  ["multicursor-mouse-click"] = { "n", "<c-leftmouse>", mc.handleMouse },
+  ["multicursor-mouse-drag"] = { "n", "<c-leftdrag>", mc.handleMouseDrag },
+  ["multicursor-mouse-release"] = { "n", "<c-leftrelease>", mc.handleMouseRelease },
+})
+
+-- Layers (Modes)
+mc.addKeymapLayer(function(layerSet)
+  layerSet({ "n", "x" }, "[p", mc.prevCursor)
+  layerSet({ "n", "x" }, "]p", mc.nextCursor)
+  layerSet("n", "<esc>", function()
+    if not mc.cursorsEnabled() then
+      mc.enableCursors()
+    else
+      local set = vim.keymap.set
+
+      -- Add or skip cursor above/below the main cursor.
+      set({ "n", "x" }, "<up>", function()
         mc.lineAddCursor(-1)
-      end,
-    },
-    ["multicursor-add-down"] = {
-      { "n", "x" },
-      "<down>",
-      function()
+      end)
+      set({ "n", "x" }, "<down>", function()
         mc.lineAddCursor(1)
-      end,
-    },
-
-    -- Line Operations (Skip)
-    ["multicursor-skip-up"] = {
-      { "n", "x" },
-      "<leader><up>",
-      function()
+      end)
+      set({ "n", "x" }, "<leader><up>", function()
         mc.lineSkipCursor(-1)
-      end,
-    },
-    ["multicursor-skip-down"] = {
-      { "n", "x" },
-      "<leader><down>",
-      function()
+      end)
+      set({ "n", "x" }, "<leader><down>", function()
         mc.lineSkipCursor(1)
-      end,
-    },
+      end)
 
-    -- Match Operations
-    ["multicursor-match-next"] = {
-      { "n", "x" },
-      "<C-d>",
-      function()
+      -- Add or skip adding a new cursor by matching word/selection
+      set({ "n", "x" }, "<leader>n", function()
         mc.matchAddCursor(1)
-      end,
-    },
-    ["multicursor-match-prev"] = {
-      { "n", "x" },
-      "<C-u>",
-      function()
+      end)
+      set({ "n", "x" }, "<leader>s", function()
+        mc.matchSkipCursor(1)
+      end)
+      set({ "n", "x" }, "<leader>N", function()
         mc.matchAddCursor(-1)
-      end,
-    },
+      end)
+      set({ "n", "x" }, "<leader>S", function()
+        mc.matchSkipCursor(-1)
+      end)
 
-    -- Mouse Operations
-    ["multicursor-mouse-click"] = { "n", "<c-leftmouse>", mc.handleMouse },
-    ["multicursor-mouse-drag"] = { "n", "<c-leftdrag>", mc.handleMouseDrag },
-    ["multicursor-mouse-release"] = { "n", "<c-leftrelease>", mc.handleMouseRelease },
-  })
+      -- Add and remove cursors with control + left click.
+      set("n", "<c-leftmouse>", mc.handleMouse)
+      set("n", "<c-leftdrag>", mc.handleMouseDrag)
+      set("n", "<c-leftrelease>", mc.handleMouseRelease)
 
-  -- Layers (Modes)
-  mc.addKeymapLayer(function(layerSet)
-    layerSet({ "n", "x" }, "[p", mc.prevCursor)
-    layerSet({ "n", "x" }, "]p", mc.nextCursor)
-    layerSet("n", "<esc>", function()
-      if not mc.cursorsEnabled() then
-        mc.enableCursors()
-      else
-        mc.clearCursors()
-      end
-    end)
+      -- Disable and enable cursors.
+      set({ "n", "x" }, "<c-q>", mc.toggleCursor)
+      mc.clearCursors()
+    end
   end)
+end)
 
-  -- Highlights
-  local hl = vim.api.nvim_set_hl
-  hl(0, "MultiCursorCursor", { reverse = true })
-  hl(0, "MultiCursorVisual", { link = "Visual" })
-  hl(0, "MultiCursorSign", { link = "SignColumn" })
-  hl(0, "MultiCursorMatchPreview", { link = "IncSearch" })
-  hl(0, "MultiCursorDisabledCursor", { reverse = true })
-  hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
-end
+-- Highlights
+local hl = vim.api.nvim_set_hl
+hl(0, "MultiCursorCursor", { reverse = true })
+hl(0, "MultiCursorVisual", { link = "Visual" })
+hl(0, "MultiCursorSign", { link = "SignColumn" })
+hl(0, "MultiCursorMatchPreview", { link = "IncSearch" })
+hl(0, "MultiCursorDisabledCursor", { reverse = true })
+hl(0, "MultiCursorDisabledVisual", { link = "Visual" })

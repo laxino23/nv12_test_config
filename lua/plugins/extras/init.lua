@@ -21,7 +21,7 @@ function M.setup()
     { src = "https://github.com/jake-stewart/multicursor.nvim" },
 
     -- UI & Visuals
-    { src = "https://github.com/nvim-tree/nvim-web-devicons" }, -- fallback
+    { src = "https://github.com/nvim-tree/nvim-web-devicons" },
     { src = "https://github.com/gen740/SmoothCursor.nvim" },
     { src = "https://github.com/mcauley-penney/visual-whitespace.nvim" },
     { src = "https://github.com/lukas-reineke/virt-column.nvim" },

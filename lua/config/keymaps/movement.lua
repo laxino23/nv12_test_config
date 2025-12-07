@@ -238,10 +238,6 @@ return function(map)
       end,
     },
 
-    -- Better Cursor Movement
-    ["move-cursor-down"] = { { "n", "x", "v" }, "j", "v:count == 0 ? 'gj' : 'j'" },
-    ["move-cursor-up"] = { { "n", "x", "v" }, "k", "v:count == 0 ? 'gk' : 'k'" },
-
     -- Center Screen After Jumps
     ["next-search-centered"] = { "n", "n", "nzzzv" },
     ["prev-search-centered"] = { "n", "N", "Nzzzv" },

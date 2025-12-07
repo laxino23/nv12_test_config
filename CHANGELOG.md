@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - *(fix)* Fix the trailing comments for the fold ([dd34df2](dd34df2606ff2b47bc53c2edfd66e19dfda9b18d))
 - Minor change ([9a38a84](9a38a84c65534cee64bcb31e0fa63364bb334630))
 - Fix the bug i forgot to add the editor keymaps lol ([c6f3a4e](c6f3a4e20cb0c3df8ca9d67fd62621ea658f4af7))
+- Fix ([bb32b9b](bb32b9b6cc6b337b690d3e69584ecb635a40d049))
 
 ### 📚 Documentation
 
@@ -39,4 +40,4 @@ All notable changes to this project will be documented in this file.
 
 - Refac the keymap dir ([b137853](b137853435fdd84e66981e160b840d21a05d1f32))
 - Refac the keymap folder ([5aa5bb1](5aa5bb1e682746964082048352a40c9c57b28090))
-- Rearrange the code structure ([5d5fff7](5d5fff7fc0fbb9ebf1ea30d7df2a08d88534f266))
+- Rearrange the code structure ([1e3ad2e](1e3ad2e9e3997a1821d317a729b538c0ef686a24))
