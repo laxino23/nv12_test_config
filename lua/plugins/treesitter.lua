@@ -6,7 +6,6 @@ vim.api.nvim_create_autocmd("BufReadPre", {
   group = vim.api.nvim_create_augroup("SetupTreesitter", { clear = true }),
   once = true,
   callback = function()
-    ---@diagnostic disable-next-line: missing-fields
     require("nvim-treesitter.configs").setup({
       ensure_installed = {
         "diff",

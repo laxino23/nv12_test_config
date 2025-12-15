@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd({ "InsertEnter", "CmdlineEnter" }, {
     })
     require("luasnip.loaders.from_vscode").load()
     require("luasnip.loaders.from_vscode").load({
-      paths = { vim.fn.stdpath("config") .. "/snippets" }, -- 你的自定义片段路径
+      paths = { vim.fn.stdpath("config") .. "/snippets" },
     })
     require("blink.cmp").setup({
       completion = {
